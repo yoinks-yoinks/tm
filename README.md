@@ -1,90 +1,120 @@
-# React + Vite + Hono + Cloudflare Workers
+# Task Manager (TM)
 
-[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/cloudflare/templates/tree/main/vite-react-template)
+A full-stack Task Manager application built as part of the **Advanced Full Stack Development & Software Testing** course. This project demonstrates modern web development practices using React, Hono, and Cloudflare Workers.
 
-This template provides a minimal setup for building a React application with TypeScript and Vite, designed to run on Cloudflare Workers. It features hot module replacement, ESLint integration, and the flexibility of Workers deployments.
+🌐 **Live Demo:** [https://tm.ehtishamsajjad.com/](https://tm.ehtishamsajjad.com/)
 
-![React + TypeScript + Vite + Cloudflare Workers](https://imagedelivery.net/wSMYJvS3Xw-n339CbDyDIA/fc7b4b62-442b-4769-641b-ad4422d74300/public)
+📚 **Course Documentation:** [AFST Course](https://github.com/ehtishamsajjad/afst)
 
-<!-- dash-content-start -->
+## ✨ Features
 
-🚀 Supercharge your web development with this powerful stack:
+- 📝 **Task Management** - Create, read, update, and delete tasks
+- 🔐 **User Authentication** - Secure login/signup with Better Auth
+- 📊 **Status Tracking** - Track tasks with statuses (todo, in-progress, done)
+- 🎯 **Drag & Drop** - Reorder tasks with intuitive drag-and-drop
+- 🌙 **Dark Mode** - Built-in theme support
+- ⚡ **Edge Deployment** - Runs on Cloudflare Workers globally
 
-- [**React**](https://react.dev/) - A modern UI library for building interactive interfaces
-- [**Vite**](https://vite.dev/) - Lightning-fast build tooling and development server
-- [**Hono**](https://hono.dev/) - Ultralight, modern backend framework
-- [**Cloudflare Workers**](https://developers.cloudflare.com/workers/) - Edge computing platform for global deployment
+## 🛠️ Tech Stack
 
-### ✨ Key Features
+### Frontend
 
-- 🔥 Hot Module Replacement (HMR) for rapid development
-- 📦 TypeScript support out of the box
-- 🛠️ ESLint configuration included
-- ⚡ Zero-config deployment to Cloudflare's global network
-- 🎯 API routes with Hono's elegant routing
-- 🔄 Full-stack development setup
-- 🔎 Built-in Observability to monitor your Worker
+- [**React 19**](https://react.dev/) - UI library
+- [**TanStack Router**](https://tanstack.com/router) - Type-safe routing
+- [**TanStack Query**](https://tanstack.com/query) - Data fetching & caching
+- [**Tailwind CSS**](https://tailwindcss.com/) - Styling
+- [**Radix UI**](https://www.radix-ui.com/) - Accessible UI components
+- [**dnd-kit**](https://dndkit.com/) - Drag and drop functionality
 
-Get started in minutes with local development or deploy directly via the Cloudflare dashboard. Perfect for building modern, performant web applications at the edge.
+### Backend
 
-<!-- dash-content-end -->
+- [**Hono**](https://hono.dev/) - Lightweight web framework
+- [**Drizzle ORM**](https://orm.drizzle.team/) - TypeScript ORM
+- [**Cloudflare D1**](https://developers.cloudflare.com/d1/) - Serverless SQLite database
+- [**Better Auth**](https://better-auth.com/) - Authentication library
+- [**Zod**](https://zod.dev/) - Schema validation
 
-## Getting Started
+### Build & Deploy
 
-To start a new project with this template, run:
+- [**Vite**](https://vite.dev/) - Build tool
+- [**Cloudflare Workers**](https://developers.cloudflare.com/workers/) - Edge runtime
+- [**Wrangler**](https://developers.cloudflare.com/workers/wrangler/) - CLI for Cloudflare
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js 22+
+- bun
+- Cloudflare account (for deployment)
+
+### Installation
 
 ```bash
-npm create cloudflare@latest -- --template=cloudflare/templates/vite-react-template
+# Clone the repository
+git clone https://github.com/ehtishamsajjad/tm.git
+cd tm
+
+# Install dependencies
+bun install
 ```
 
-A live deployment of this template is available at:
-[https://react-vite-template.templates.workers.dev](https://react-vite-template.templates.workers.dev)
-
-## Development
-
-Install dependencies:
+### Development
 
 ```bash
-npm install
-```
-
-Start the development server with:
-
-```bash
-npm run dev
+# Start the development server
+bun run dev
 ```
 
 Your application will be available at [http://localhost:5173](http://localhost:5173).
 
-## Production
-
-Build your project for production:
+### Database Setup
 
 ```bash
-npm run build
+# Generate migrations
+bun run db:generate
+
+# Apply migrations locally
+bun run db:migrate:local
 ```
 
-Preview your build locally:
+## 📦 Production
 
 ```bash
-npm run preview
+# Build for production
+bun run build
+
+# Preview locally
+bun run preview
+
+# Deploy to Cloudflare Workers
+bun run deploy
 ```
 
-Deploy your project to Cloudflare Workers:
+## 📁 Project Structure
 
-```bash
-npm run build && npm run deploy
+```text
+tm/
+├── src/
+│   ├── react-app/          # Frontend React application
+│   │   ├── components/     # UI components
+│   │   ├── hooks/          # Custom React hooks
+│   │   ├── routes/         # TanStack Router pages
+│   │   └── lib/            # Utilities
+│   └── worker/             # Backend Hono API
+│       ├── db/             # Database schema
+│       └── lib/            # Auth & utilities
+├── drizzle/                # Database migrations
+└── public/                 # Static assets
 ```
 
-Monitor your workers:
+## 📄 License
 
-```bash
-npx wrangler tail
-```
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Additional Resources
+## 👨‍💻 Author
 
-- [Cloudflare Workers Documentation](https://developers.cloudflare.com/workers/)
-- [Vite Documentation](https://vitejs.dev/guide/)
-- [React Documentation](https://reactjs.org/)
-- [Hono Documentation](https://hono.dev/)
+**Ehtisham Sajjad** - Senior Software Engineer
+
+- LinkedIn: [@ehtishamsajjad](https://www.linkedin.com/in/ehtishamsajjad/)
+- Email: [hi@ehtishamsajjad.com](mailto:hi@ehtishamsajjad.com)

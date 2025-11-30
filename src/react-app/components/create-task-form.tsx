@@ -1,19 +1,14 @@
-import { useMutation } from "@tanstack/react-query";
-import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  createTaskSchema,
+  useCreateTaskMutation,
+  type CreateTaskForm,
+} from "@/hooks/use-create-task-mutation";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { api } from "@/lib/api";
-
-const createTaskSchema = z.object({
-  title: z.string().min(1, "Title is required"),
-  description: z.string().optional(),
-});
-
-type CreateTaskForm = z.infer<typeof createTaskSchema>;
 
 interface CreateTaskFormProps {
   onSuccess: () => void;
@@ -28,20 +23,19 @@ export function CreateTaskForm({ onSuccess }: CreateTaskFormProps) {
     },
   });
 
-  const createTaskMutation = useMutation({
-    mutationFn: (data: CreateTaskForm) => api.post("/api/tasks", data),
-    onSuccess: () => {
-      toast.success("Task created successfully");
-      form.reset();
-      onSuccess();
-    },
-    onError: () => {
-      toast.error("Failed to create task");
-    },
-  });
+  const { mutate, isPending } = useCreateTaskMutation();
 
   const onSubmit = (data: CreateTaskForm) => {
-    createTaskMutation.mutate(data);
+    mutate(data, {
+      onSuccess: () => {
+        toast.success("Task created successfully");
+        form.reset();
+        onSuccess();
+      },
+      onError: () => {
+        toast.error("Failed to create task");
+      },
+    });
   };
 
   return (
@@ -67,12 +61,8 @@ export function CreateTaskForm({ onSuccess }: CreateTaskFormProps) {
           )}
         />
       </div>
-      <Button
-        type="submit"
-        disabled={createTaskMutation.isPending}
-        className="w-full"
-      >
-        {createTaskMutation.isPending ? "Creating..." : "Create Task"}
+      <Button type="submit" disabled={isPending} className="w-full">
+        {isPending ? "Creating..." : "Create Task"}
       </Button>
     </form>
   );

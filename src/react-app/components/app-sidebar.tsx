@@ -1,13 +1,4 @@
-import {
-  IconChartBar,
-  IconDashboard,
-  IconFolder,
-  IconHelp,
-  IconListDetails,
-  IconSearch,
-  IconSettings,
-  IconUsers,
-} from "@tabler/icons-react";
+import { IconDashboard, IconHelp } from "@tabler/icons-react";
 import { ListTodo } from "lucide-react";
 import * as React from "react";
 
@@ -42,42 +33,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         url: "#",
         icon: IconDashboard,
       },
-      {
-        title: "Lifecycle",
-        url: "#",
-        icon: IconListDetails,
-      },
-      {
-        title: "Analytics",
-        url: "#",
-        icon: IconChartBar,
-      },
-      {
-        title: "Projects",
-        url: "#",
-        icon: IconFolder,
-      },
-      {
-        title: "Team",
-        url: "#",
-        icon: IconUsers,
-      },
     ],
     navSecondary: [
-      {
-        title: "Settings",
-        url: "#",
-        icon: IconSettings,
-      },
       {
         title: "Get Help",
         url: "#",
         icon: IconHelp,
-      },
-      {
-        title: "Search",
-        url: "#",
-        icon: IconSearch,
       },
     ],
   };

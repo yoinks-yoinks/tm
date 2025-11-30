@@ -82,13 +82,6 @@ function LandingPage() {
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="h-12 px-8 text-base"
-              >
-                Watch Demo
-              </Button>
             </div>
           </div>
 
@@ -291,17 +284,6 @@ function LandingPage() {
                 <ListTodo className="size-4" />
               </div>
               <span className="text-lg font-bold">Task Manager Inc.</span>
-            </div>
-            <div className="flex items-center gap-6 text-sm text-muted-foreground">
-              <a href="#" className="hover:text-foreground transition-colors">
-                Privacy
-              </a>
-              <a href="#" className="hover:text-foreground transition-colors">
-                Terms
-              </a>
-              <a href="#" className="hover:text-foreground transition-colors">
-                Contact
-              </a>
             </div>
             <p className="text-sm text-muted-foreground">
               © 2025 Task Manager Inc. All rights reserved.

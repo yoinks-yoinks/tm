@@ -13,7 +13,7 @@
 		{
 			"binding": "DB",
 			"database_name": "tm-d1",
-			"database_id": "0122c898-3541-43a8-8bd2-52a2e0081acc",
+			"database_id": "5e6ea8f0-53b5-4a5b-9834-37154a3256a7",
 			"migrations_dir": "drizzle"
 		}
 	],

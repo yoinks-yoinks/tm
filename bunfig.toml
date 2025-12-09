@@ -9,3 +9,6 @@ coverage = false
 
 # Default timeout for tests (10 seconds)
 timeout = 10000
+
+# Only run tests from src directory (exclude Playwright E2E tests)
+root = "./src"

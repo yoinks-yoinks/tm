@@ -1,0 +1,11 @@
+# Bun configuration for testing
+
+[test]
+# Preload happy-dom for DOM testing support
+preload = ["./src/react-app/__tests__/setup.ts"]
+
+# Enable coverage reporting
+coverage = false
+
+# Default timeout for tests (10 seconds)
+timeout = 10000

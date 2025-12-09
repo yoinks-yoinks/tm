@@ -918,7 +918,7 @@ Return list of files created/modified.
 
 Use this checklist to track completion:
 
-- [ ] Sprint 0: Testing Infrastructure Setup
+- [x] Sprint 0: Testing Infrastructure Setup ✅ (Committed: 7beef42)
 - [ ] Sprint 1: Dark Mode Toggle
 - [ ] Sprint 2: Task Priorities
 - [ ] Sprint 3: Due Dates

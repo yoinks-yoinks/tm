@@ -6,6 +6,7 @@ import { SectionCards } from "@/components/section-cards";
 import { SiteHeader } from "@/components/site-header";
 import { Button } from "@/components/ui/button";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { useDocumentTitle } from "@/hooks/use-document-title";
 import { useTasksQuery } from "@/hooks/use-tasks-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { IconLayoutKanban, IconTable } from "@tabler/icons-react";
@@ -18,6 +19,8 @@ export const Route = createFileRoute("/_protected/dashboard/")({
 type ViewMode = "table" | "kanban";
 
 function RouteComponent() {
+  useDocumentTitle("Dashboard");
+
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
     if (typeof window !== "undefined") {
       return (localStorage.getItem("dashboard-view") as ViewMode) || "table";

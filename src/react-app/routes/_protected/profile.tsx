@@ -5,6 +5,7 @@ import { SiteHeader } from "@/components/site-header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { useDocumentTitle } from "@/hooks/use-document-title";
 import { useSession } from "@/lib/auth-client";
 import { createFileRoute } from "@tanstack/react-router";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -14,6 +15,7 @@ export const Route = createFileRoute("/_protected/profile")({
 });
 
 function RouteComponent() {
+  useDocumentTitle("Profile");
   const { data: session, isPending } = useSession();
 
   return (

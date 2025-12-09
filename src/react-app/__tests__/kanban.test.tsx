@@ -97,6 +97,7 @@ describe("KanbanColumn Component", () => {
         id="todo"
         title="To Do"
         tasks={columnTasks}
+        index={0}
       />,
       { wrapper: createWrapper() }
     );
@@ -110,6 +111,7 @@ describe("KanbanColumn Component", () => {
         id="todo"
         title="To Do"
         tasks={columnTasks}
+        index={0}
       />,
       { wrapper: createWrapper() }
     );
@@ -123,6 +125,7 @@ describe("KanbanColumn Component", () => {
         id="completed"
         title="Completed"
         tasks={[]}
+        index={2}
       />,
       { wrapper: createWrapper() }
     );

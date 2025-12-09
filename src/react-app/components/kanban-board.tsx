@@ -105,12 +105,13 @@ export function KanbanBoard({ tasks }: KanbanBoardProps) {
       onDragEnd={handleDragEnd}
     >
       <div className="flex gap-4 overflow-x-auto pb-4">
-        {columns.map((column) => (
+        {columns.map((column, index) => (
           <KanbanColumn
             key={column.id}
             id={column.id}
             title={column.title}
             tasks={getTasksByStatus(column.id)}
+            index={index}
           />
         ))}
       </div>

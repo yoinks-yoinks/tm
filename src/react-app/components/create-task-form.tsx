@@ -1,6 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { priorities, priorityConfig, type Priority } from "@/constants/priority";
 import {
   createTaskSchema,
   useCreateTaskMutation,
@@ -20,6 +28,7 @@ export function CreateTaskForm({ onSuccess }: CreateTaskFormProps) {
     defaultValues: {
       title: "",
       description: "",
+      priority: "medium",
     },
   });
 
@@ -58,6 +67,29 @@ export function CreateTaskForm({ onSuccess }: CreateTaskFormProps) {
           control={form.control}
           render={({ field }) => (
             <Textarea {...field} placeholder="Description (optional)" />
+          )}
+        />
+      </div>
+      <div>
+        <Controller
+          name="priority"
+          control={form.control}
+          render={({ field }) => (
+            <Select
+              value={field.value}
+              onValueChange={(value) => field.onChange(value as Priority)}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select priority" />
+              </SelectTrigger>
+              <SelectContent>
+                {priorities.map((priority) => (
+                  <SelectItem key={priority} value={priority}>
+                    {priorityConfig[priority].label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           )}
         />
       </div>

@@ -919,7 +919,7 @@ Return list of files created/modified.
 Use this checklist to track completion:
 
 - [x] Sprint 0: Testing Infrastructure Setup ✅ (Committed: 7beef42)
-- [ ] Sprint 1: Dark Mode Toggle
+- [x] Sprint 1: Dark Mode Toggle ✅ (Committed: 9211070)
 - [ ] Sprint 2: Task Priorities
 - [ ] Sprint 3: Due Dates
 - [ ] Sprint 4: Tags System

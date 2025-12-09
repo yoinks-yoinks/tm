@@ -1,4 +1,5 @@
 import { APIEndpoints } from "@/constants/api-endpoints";
+import { priorities } from "@/constants/priority";
 import { QueryKeys } from "@/constants/query-keys";
 import { api } from "@/lib/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -7,6 +8,7 @@ import z from "zod";
 export const createTaskSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().optional(),
+  priority: z.enum(priorities).optional().default("medium"),
 });
 
 export type CreateTaskForm = z.infer<typeof createTaskSchema>;
@@ -16,6 +18,7 @@ const taskSchema = z.object({
   title: z.string(),
   description: z.string(),
   status: z.enum(["todo", "in_progress", "completed"]),
+  priority: z.enum(priorities),
   createdAt: z.string(),
 });
 

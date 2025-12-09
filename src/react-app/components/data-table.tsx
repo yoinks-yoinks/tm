@@ -68,12 +68,15 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useTasksQuery } from "@/hooks/use-tasks-query";
 import { useUpdateTaskMutation } from "@/hooks/use-update-task-mutation";
 import { FormEvent, useEffect, useState } from "react";
+import { priorities, type Priority } from "@/constants/priority";
+import { PriorityBadge } from "./priority-badge";
 
 export const taskSchema = z.object({
   id: z.string(),
   title: z.string(),
   description: z.string(),
   status: z.enum(["todo", "in_progress", "completed"]),
+  priority: z.enum(priorities),
   createdAt: z.string(),
 });
 
@@ -114,6 +117,7 @@ function TaskCellViewer({ task }: { task: Task }) {
   const [title, setTitle] = useState(task.title);
   const [description, setDescription] = useState(task.description);
   const [status, setStatus] = useState(task.status);
+  const [priority, setPriority] = useState<Priority>(task.priority);
   const [open, setOpen] = useState(false);
 
   const handleSubmit = (e: FormEvent) => {
@@ -125,6 +129,7 @@ function TaskCellViewer({ task }: { task: Task }) {
           title,
           description,
           status,
+          priority,
         })
         .then(() => setOpen(false)),
       {
@@ -189,6 +194,23 @@ function TaskCellViewer({ task }: { task: Task }) {
               </Select>
             </div>
             <div className="flex flex-col gap-3">
+              <Label htmlFor="priority">Priority</Label>
+              <Select
+                value={priority}
+                onValueChange={(value) => setPriority(value as Priority)}
+              >
+                <SelectTrigger id="priority" className="w-full">
+                  <SelectValue placeholder="Select a priority" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="low">Low</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                  <SelectItem value="high">High</SelectItem>
+                  <SelectItem value="urgent">Urgent</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex flex-col gap-3">
               <Label>Created At</Label>
               <div className="text-muted-foreground">
                 {formatDate(task.createdAt)}
@@ -216,6 +238,7 @@ function ActionsCell({ task }: { task: Task }) {
   const [title, setTitle] = useState(task.title);
   const [description, setDescription] = useState(task.description);
   const [status, setStatus] = useState(task.status);
+  const [priority, setPriority] = useState<Priority>(task.priority);
   const [open, setOpen] = useState(false);
 
   const handleDelete = () => {
@@ -235,6 +258,7 @@ function ActionsCell({ task }: { task: Task }) {
           title,
           description,
           status,
+          priority,
         })
         .then(() => setOpen(false)),
       {
@@ -321,6 +345,23 @@ function ActionsCell({ task }: { task: Task }) {
               </Select>
             </div>
             <div className="flex flex-col gap-3">
+              <Label htmlFor={`edit-priority-${task.id}`}>Priority</Label>
+              <Select
+                value={priority}
+                onValueChange={(value) => setPriority(value as Priority)}
+              >
+                <SelectTrigger id={`edit-priority-${task.id}`} className="w-full">
+                  <SelectValue placeholder="Select a priority" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="low">Low</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                  <SelectItem value="high">High</SelectItem>
+                  <SelectItem value="urgent">Urgent</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex flex-col gap-3">
               <Label>Created At</Label>
               <div className="text-muted-foreground">
                 {formatDate(task.createdAt)}
@@ -396,6 +437,14 @@ const columns: ColumnDef<Task>[] = [
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => <StatusCell task={row.original} />,
+  },
+  {
+    accessorKey: "priority",
+    header: "Priority",
+    cell: ({ row }) => <PriorityBadge priority={row.original.priority} />,
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
   },
   {
     accessorKey: "createdAt",

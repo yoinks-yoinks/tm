@@ -22,7 +22,6 @@ import {
   VisibilityState,
 } from "@tanstack/react-table";
 import { toast } from "sonner";
-import { z } from "zod";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -65,10 +64,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useDeleteTaskMutation } from "@/hooks/use-delete-task-mutation";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useTasksQuery, type Task, type Tag } from "@/hooks/use-tasks-query";
+import { useTasksQuery, type Task } from "@/hooks/use-tasks-query";
 import { useUpdateTaskMutation } from "@/hooks/use-update-task-mutation";
 import { FormEvent, useEffect, useState } from "react";
-import { priorities, type Priority } from "@/constants/priority";
+import { type Priority } from "@/constants/priority";
 import { PriorityBadge } from "./priority-badge";
 import { DueDateBadge } from "./due-date-badge";
 import { TagBadge } from "./tag-badge";
@@ -491,7 +490,7 @@ const columns: ColumnDef<Task>[] = [
         </div>
       );
     },
-    filterFn: (row, id, value: string[]) => {
+    filterFn: (row, _id, value: string[]) => {
       const tags = row.original.tags || [];
       if (!value || value.length === 0) return true;
       return tags.some((tag) => value.includes(tag.id));

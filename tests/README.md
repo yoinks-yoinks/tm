@@ -34,6 +34,7 @@ Each test suite creates its own test user to ensure isolation.
 ## Helpers
 
 See `helpers.ts` for utility functions:
+
 - `generateTestEmail()` - Generate unique test emails
 - `login()` - Login helper
 - `signUp()` - Sign up helper

@@ -14,6 +14,7 @@ import { Route as ProtectedRouteImport } from './routes/_protected'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ResetPasswordTokenRouteImport } from './routes/reset-password.$token'
+import { Route as ProtectedProfileRouteImport } from './routes/_protected/profile'
 import { Route as AuthSignUpRouteImport } from './routes/_auth/sign-up'
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 import { Route as AuthForgetPasswordRouteImport } from './routes/_auth/forget-password'
@@ -42,6 +43,11 @@ const ResetPasswordTokenRoute = ResetPasswordTokenRouteImport.update({
   path: '/reset-password/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProtectedProfileRoute = ProtectedProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => ProtectedRoute,
+} as any)
 const AuthSignUpRoute = AuthSignUpRouteImport.update({
   id: '/sign-up',
   path: '/sign-up',
@@ -69,6 +75,7 @@ export interface FileRoutesByFullPath {
   '/forget-password': typeof AuthForgetPasswordRoute
   '/login': typeof AuthLoginRoute
   '/sign-up': typeof AuthSignUpRoute
+  '/profile': typeof ProtectedProfileRoute
   '/reset-password/$token': typeof ResetPasswordTokenRoute
   '/dashboard': typeof ProtectedDashboardIndexRoute
 }
@@ -78,6 +85,7 @@ export interface FileRoutesByTo {
   '/forget-password': typeof AuthForgetPasswordRoute
   '/login': typeof AuthLoginRoute
   '/sign-up': typeof AuthSignUpRoute
+  '/profile': typeof ProtectedProfileRoute
   '/reset-password/$token': typeof ResetPasswordTokenRoute
   '/dashboard': typeof ProtectedDashboardIndexRoute
 }
@@ -90,6 +98,7 @@ export interface FileRoutesById {
   '/_auth/forget-password': typeof AuthForgetPasswordRoute
   '/_auth/login': typeof AuthLoginRoute
   '/_auth/sign-up': typeof AuthSignUpRoute
+  '/_protected/profile': typeof ProtectedProfileRoute
   '/reset-password/$token': typeof ResetPasswordTokenRoute
   '/_protected/dashboard/': typeof ProtectedDashboardIndexRoute
 }
@@ -101,6 +110,7 @@ export interface FileRouteTypes {
     | '/forget-password'
     | '/login'
     | '/sign-up'
+    | '/profile'
     | '/reset-password/$token'
     | '/dashboard'
   fileRoutesByTo: FileRoutesByTo
@@ -110,6 +120,7 @@ export interface FileRouteTypes {
     | '/forget-password'
     | '/login'
     | '/sign-up'
+    | '/profile'
     | '/reset-password/$token'
     | '/dashboard'
   id:
@@ -121,6 +132,7 @@ export interface FileRouteTypes {
     | '/_auth/forget-password'
     | '/_auth/login'
     | '/_auth/sign-up'
+    | '/_protected/profile'
     | '/reset-password/$token'
     | '/_protected/dashboard/'
   fileRoutesById: FileRoutesById
@@ -170,6 +182,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResetPasswordTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_protected/profile': {
+      id: '/_protected/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProtectedProfileRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
     '/_auth/sign-up': {
       id: '/_auth/sign-up'
       path: '/sign-up'
@@ -216,10 +235,12 @@ const AuthRouteChildren: AuthRouteChildren = {
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
 interface ProtectedRouteChildren {
+  ProtectedProfileRoute: typeof ProtectedProfileRoute
   ProtectedDashboardIndexRoute: typeof ProtectedDashboardIndexRoute
 }
 
 const ProtectedRouteChildren: ProtectedRouteChildren = {
+  ProtectedProfileRoute: ProtectedProfileRoute,
   ProtectedDashboardIndexRoute: ProtectedDashboardIndexRoute,
 }
 

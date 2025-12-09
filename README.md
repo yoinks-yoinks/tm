@@ -2,7 +2,7 @@
 
 A full-stack Task Manager application built as part of the **Advanced Full Stack Development & Software Testing** course. This project demonstrates modern web development practices using React, Hono, and Cloudflare Workers.
 
-🌐 **Live Demo:** [https://tm.ehtishamsajjad.com/](https://tm.ehtishamsajjad.com/)
+🌐 **Live Demo:** [https://tm.writetoberyal.workers.dev/](https://tm.writetoberyal.workers.dev/)
 
 📚 **Course Documentation:** [AFST Course](https://github.com/ehtishamsajjad/afst)
 
@@ -11,8 +11,12 @@ A full-stack Task Manager application built as part of the **Advanced Full Stack
 - 📝 **Task Management** - Create, read, update, and delete tasks
 - 🔐 **User Authentication** - Secure login/signup with Better Auth
 - 📊 **Status Tracking** - Track tasks with statuses (todo, in-progress, done)
-- 🎯 **Drag & Drop** - Reorder tasks with intuitive drag-and-drop
-- 🌙 **Dark Mode** - Built-in theme support
+- 🎯 **Priority Levels** - Assign Low, Medium, High, or Urgent priorities
+- 📅 **Due Dates** - Set and track task deadlines with overdue indicators
+- 🏷️ **Tags** - Organize tasks with color-coded tags
+- 👤 **User Profile** - Update name and change password
+- 📋 **Kanban Board** - Drag & drop tasks between columns
+- 🌙 **Dark Mode** - Built-in theme toggle with localStorage persistence
 - ⚡ **Edge Deployment** - Runs on Cloudflare Workers globally
 
 ## 🛠️ Tech Stack
@@ -52,7 +56,7 @@ A full-stack Task Manager application built as part of the **Advanced Full Stack
 
 ```bash
 # Clone the repository
-git clone https://github.com/ehtishamsajjad/tm.git
+git clone https://github.com/yoinks-yoinks/tm.git
 cd tm
 
 # Install dependencies

@@ -144,7 +144,7 @@ describe("KanbanBoard Component", () => {
   });
 
   test("groups tasks by status", () => {
-    const { getByText, container } = render(
+    const { getByText } = render(
       <KanbanBoard tasks={mockTasks} />,
       { wrapper: createWrapper() }
     );
@@ -156,7 +156,7 @@ describe("KanbanBoard Component", () => {
   });
 
   test("renders empty board message when no tasks", () => {
-    const { getByText } = render(
+    render(
       <KanbanBoard tasks={[]} />,
       { wrapper: createWrapper() }
     );

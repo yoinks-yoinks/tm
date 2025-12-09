@@ -3,7 +3,7 @@ import { and, eq, inArray } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/d1";
 import { Hono } from "hono";
 import { z } from "zod";
-import { task, taskStatusEnum, taskPriorityEnum, tag, taskTag, tagColorEnum, user, account } from "./db/schema";
+import { task, taskStatusEnum, taskPriorityEnum, tag, taskTag, tagColorEnum, user } from "./db/schema";
 import { getAuth } from "./lib/auth";
 import { getAuthUser } from "./lib/get-auth-user";
 

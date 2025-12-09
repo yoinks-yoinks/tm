@@ -60,7 +60,7 @@ export function KanbanBoard({ tasks }: KanbanBoardProps) {
     }
   };
 
-  const handleDragOver = (event: DragOverEvent) => {
+  const handleDragOver = (_event: DragOverEvent) => {
     // Can be used for visual feedback during drag
   };
 

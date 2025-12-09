@@ -17,7 +17,7 @@ export function SiteHeader() {
           <ThemeToggle />
           <Button variant="ghost" asChild size="sm" className="hidden sm:flex">
             <a
-              href="https://github.com/ehtishamsajjad/tm"
+              href="https://github.com/yoinks-yoinks/tm"
               rel="noopener noreferrer"
               target="_blank"
               className="dark:text-foreground"

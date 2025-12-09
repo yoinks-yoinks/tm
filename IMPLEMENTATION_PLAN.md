@@ -921,7 +921,7 @@ Use this checklist to track completion:
 - [x] Sprint 0: Testing Infrastructure Setup ✅ (Committed: 7beef42)
 - [x] Sprint 1: Dark Mode Toggle ✅ (Committed: 9211070)
 - [x] Sprint 2: Task Priorities ✅ (Committed: f488ad4)
-- [ ] Sprint 3: Due Dates
+- [x] Sprint 3: Due Dates ✅ (Committed: 53bd3f9)
 - [ ] Sprint 4: Tags System
 - [ ] Sprint 5: User Profile Page
 - [ ] Sprint 6: Drag & Drop Kanban

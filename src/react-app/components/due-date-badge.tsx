@@ -22,9 +22,10 @@ interface DueDateBadgeProps {
   dueDate: string | null | undefined;
   className?: string;
   showIcon?: boolean;
+  compact?: boolean;
 }
 
-export function DueDateBadge({ dueDate, className, showIcon = true }: DueDateBadgeProps) {
+export function DueDateBadge({ dueDate, className, showIcon = true, compact = false }: DueDateBadgeProps) {
   const status = getDueDateStatus(dueDate);
   
   if (!status || !dueDate) return null;
@@ -35,10 +36,10 @@ export function DueDateBadge({ dueDate, className, showIcon = true }: DueDateBad
   return (
     <Badge
       variant="secondary"
-      className={cn("gap-1", config.className, className)}
+      className={cn("gap-1", config.className, compact && "text-xs px-1.5 py-0", className)}
       data-status={status}
     >
-      {showIcon && <Icon className="h-3 w-3" />}
+      {showIcon && <Icon className={cn("h-3 w-3", compact && "h-2.5 w-2.5")} />}
       {formatDueDate(dueDate)}
     </Badge>
   );

@@ -1,4 +1,4 @@
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { integer, primaryKey, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 export const user = sqliteTable("user", {
   id: text("id").primaryKey(),
@@ -73,3 +73,37 @@ export const task = sqliteTable("task", {
   createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
   updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
 });
+
+// Tag color options
+export const tagColorEnum = [
+  "gray", "red", "orange", "yellow", "green", 
+  "teal", "blue", "indigo", "purple", "pink"
+] as const;
+export type TagColorType = (typeof tagColorEnum)[number];
+
+// Tags table - user-specific tags
+export const tag = sqliteTable("tag", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  color: text("color", { enum: tagColorEnum }).notNull().default("blue"),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+});
+
+// Junction table for many-to-many relationship between tasks and tags
+export const taskTag = sqliteTable(
+  "task_tag",
+  {
+    taskId: text("task_id")
+      .notNull()
+      .references(() => task.id, { onDelete: "cascade" }),
+    tagId: text("tag_id")
+      .notNull()
+      .references(() => tag.id, { onDelete: "cascade" }),
+  },
+  (table) => [
+    primaryKey({ columns: [table.taskId, table.tagId] }),
+  ]
+);

@@ -1,5 +1,4 @@
 import { APIEndpoints } from "@/constants/api-endpoints";
-import { priorities } from "@/constants/priority";
 import { tagColorValues } from "@/constants/tag-colors";
 import { QueryKeys } from "@/constants/query-keys";
 import { api } from "@/lib/api";
@@ -10,31 +9,20 @@ const tagSchema = z.object({
   id: z.string(),
   name: z.string(),
   color: z.enum(tagColorValues),
-});
-
-const taskSchema = z.object({
-  id: z.string(),
-  title: z.string(),
-  description: z.string(),
-  status: z.enum(["todo", "in_progress", "completed"]),
-  priority: z.enum(priorities),
-  dueDate: z.string().nullable(),
   createdAt: z.string(),
-  tags: z.array(tagSchema).default([]),
 });
 
 const schema = z.object({
-  tasks: z.array(taskSchema),
+  tags: z.array(tagSchema),
 });
 
-export type Task = z.infer<typeof taskSchema>;
 export type Tag = z.infer<typeof tagSchema>;
 
-export const useTasksQuery = () => {
+export const useTagsQuery = () => {
   return useQuery({
-    queryKey: [QueryKeys.Tasks],
+    queryKey: [QueryKeys.Tags],
     queryFn: async () => {
-      const { data } = await api.get(APIEndpoints.Tasks);
+      const { data } = await api.get(APIEndpoints.Tags);
       return schema.parse(data);
     },
   });

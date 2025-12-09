@@ -65,24 +65,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useDeleteTaskMutation } from "@/hooks/use-delete-task-mutation";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useTasksQuery } from "@/hooks/use-tasks-query";
+import { useTasksQuery, type Task, type Tag } from "@/hooks/use-tasks-query";
 import { useUpdateTaskMutation } from "@/hooks/use-update-task-mutation";
 import { FormEvent, useEffect, useState } from "react";
 import { priorities, type Priority } from "@/constants/priority";
 import { PriorityBadge } from "./priority-badge";
 import { DueDateBadge } from "./due-date-badge";
-
-export const taskSchema = z.object({
-  id: z.string(),
-  title: z.string(),
-  description: z.string(),
-  status: z.enum(["todo", "in_progress", "completed"]),
-  priority: z.enum(priorities),
-  dueDate: z.string().nullable(),
-  createdAt: z.string(),
-});
-
-export type Task = z.infer<typeof taskSchema>;
+import { TagBadge } from "./tag-badge";
 
 function getStatusDisplay(status: Task["status"]) {
   switch (status) {
@@ -481,6 +470,31 @@ const columns: ColumnDef<Task>[] = [
       if (!a) return 1;
       if (!b) return -1;
       return new Date(a).getTime() - new Date(b).getTime();
+    },
+  },
+  {
+    accessorKey: "tags",
+    header: "Tags",
+    cell: ({ row }) => {
+      const tags = row.original.tags || [];
+      if (tags.length === 0) {
+        return <span className="text-muted-foreground text-sm">No tags</span>;
+      }
+      return (
+        <div className="flex flex-wrap gap-1 max-w-[200px]">
+          {tags.slice(0, 3).map((tag) => (
+            <TagBadge key={tag.id} name={tag.name} color={tag.color} />
+          ))}
+          {tags.length > 3 && (
+            <span className="text-muted-foreground text-xs">+{tags.length - 3}</span>
+          )}
+        </div>
+      );
+    },
+    filterFn: (row, id, value: string[]) => {
+      const tags = row.original.tags || [];
+      if (!value || value.length === 0) return true;
+      return tags.some((tag) => value.includes(tag.id));
     },
   },
   {

@@ -3,7 +3,7 @@ import { and, eq, inArray } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/d1";
 import { Hono } from "hono";
 import { z } from "zod";
-import { task, taskStatusEnum, taskPriorityEnum, tag, taskTag, tagColorEnum } from "./db/schema";
+import { task, taskStatusEnum, taskPriorityEnum, tag, taskTag, tagColorEnum, user, account } from "./db/schema";
 import { getAuth } from "./lib/auth";
 import { getAuthUser } from "./lib/get-auth-user";
 
@@ -35,6 +35,15 @@ const updateTagSchema = z.object({
   color: z.enum(tagColorEnum).optional(),
 });
 
+const updateProfileSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+});
+
+const changePasswordSchema = z.object({
+  currentPassword: z.string().min(1, "Current password is required"),
+  newPassword: z.string().min(8, "Password must be at least 8 characters"),
+});
+
 const app = new Hono<{ Bindings: Env }>();
 
 app.get("/api/", (c) => c.json({ name: "Cloudflare" }));
@@ -55,6 +64,57 @@ app.get("/api/me", async (c) => {
   }
 
   return c.json({ user: session.user });
+});
+
+// Update user profile
+app.patch("/api/user", zValidator("json", updateProfileSchema), async (c) => {
+  const authUser = await getAuthUser(c);
+  if (!authUser) {
+    return c.json({ error: "Unauthorized" }, 401);
+  }
+
+  const body = c.req.valid("json");
+  const db = drizzle(c.env.DB);
+
+  await db
+    .update(user)
+    .set({
+      name: body.name,
+      updatedAt: new Date(),
+    })
+    .where(eq(user.id, authUser.id));
+
+  return c.json({ message: "Profile updated successfully" });
+});
+
+// Change password
+app.post("/api/user/change-password", zValidator("json", changePasswordSchema), async (c) => {
+  const authUser = await getAuthUser(c);
+  if (!authUser) {
+    return c.json({ error: "Unauthorized" }, 401);
+  }
+
+  const body = c.req.valid("json");
+  const auth = getAuth(c.env);
+
+  // Use Better Auth's built-in password change
+  try {
+    const result = await auth.api.changePassword({
+      body: {
+        currentPassword: body.currentPassword,
+        newPassword: body.newPassword,
+      },
+      headers: c.req.raw.headers,
+    });
+
+    if (!result) {
+      return c.json({ error: "Failed to change password" }, 400);
+    }
+
+    return c.json({ message: "Password changed successfully" });
+  } catch (error) {
+    return c.json({ error: "Current password is incorrect" }, 400);
+  }
 });
 
 app.get("/api/tasks", async (c) => {

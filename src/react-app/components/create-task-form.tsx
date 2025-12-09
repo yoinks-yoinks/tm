@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -29,6 +30,7 @@ export function CreateTaskForm({ onSuccess }: CreateTaskFormProps) {
       title: "",
       description: "",
       priority: "medium",
+      dueDate: null,
     },
   });
 
@@ -90,6 +92,25 @@ export function CreateTaskForm({ onSuccess }: CreateTaskFormProps) {
                 ))}
               </SelectContent>
             </Select>
+          )}
+        />
+      </div>
+      <div>
+        <Label htmlFor="dueDate" className="text-sm text-muted-foreground mb-1 block">
+          Due Date (optional)
+        </Label>
+        <Controller
+          name="dueDate"
+          control={form.control}
+          render={({ field }) => (
+            <Input
+              id="dueDate"
+              type="datetime-local"
+              value={field.value ? field.value.slice(0, 16) : ""}
+              onChange={(e) =>
+                field.onChange(e.target.value ? new Date(e.target.value).toISOString() : null)
+              }
+            />
           )}
         />
       </div>

@@ -12,6 +12,7 @@ const createTaskSchema = z.object({
   description: z.string().optional(),
   status: z.enum(taskStatusEnum).optional().default("todo"),
   priority: z.enum(taskPriorityEnum).optional().default("medium"),
+  dueDate: z.string().datetime().optional().nullable(),
 });
 
 const updateTaskSchema = z.object({
@@ -19,6 +20,7 @@ const updateTaskSchema = z.object({
   description: z.string().optional(),
   status: z.enum(taskStatusEnum).optional(),
   priority: z.enum(taskPriorityEnum).optional(),
+  dueDate: z.string().datetime().optional().nullable(),
 });
 
 const app = new Hono<{ Bindings: Env }>();
@@ -92,6 +94,7 @@ app.post("/api/tasks", zValidator("json", createTaskSchema), async (c) => {
     description: body.description ?? null,
     status: body.status,
     priority: body.priority,
+    dueDate: body.dueDate ? new Date(body.dueDate) : null,
     userId: user.id,
     createdAt: now,
     updatedAt: now,
@@ -130,6 +133,7 @@ app.patch("/api/tasks/:id", zValidator("json", updateTaskSchema), async (c) => {
   if (body.description !== undefined) updateData.description = body.description;
   if (body.status !== undefined) updateData.status = body.status;
   if (body.priority !== undefined) updateData.priority = body.priority;
+  if (body.dueDate !== undefined) updateData.dueDate = body.dueDate ? new Date(body.dueDate) : null;
 
   await db.update(task).set(updateData).where(eq(task.id, taskId));
 

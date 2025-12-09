@@ -9,6 +9,7 @@ export const createTaskSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().optional(),
   priority: z.enum(priorities).optional().default("medium"),
+  dueDate: z.string().optional().nullable(),
 });
 
 export type CreateTaskForm = z.infer<typeof createTaskSchema>;
@@ -19,6 +20,7 @@ const taskSchema = z.object({
   description: z.string(),
   status: z.enum(["todo", "in_progress", "completed"]),
   priority: z.enum(priorities),
+  dueDate: z.string().nullable(),
   createdAt: z.string(),
 });
 

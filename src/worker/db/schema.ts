@@ -66,6 +66,7 @@ export const task = sqliteTable("task", {
   description: text("description"),
   status: text("status", { enum: taskStatusEnum }).notNull().default("todo"),
   priority: text("priority", { enum: taskPriorityEnum }).notNull().default("medium"),
+  dueDate: integer("due_date", { mode: "timestamp" }),
   userId: text("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),

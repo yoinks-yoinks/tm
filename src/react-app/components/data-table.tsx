@@ -70,6 +70,7 @@ import { useUpdateTaskMutation } from "@/hooks/use-update-task-mutation";
 import { FormEvent, useEffect, useState } from "react";
 import { priorities, type Priority } from "@/constants/priority";
 import { PriorityBadge } from "./priority-badge";
+import { DueDateBadge } from "./due-date-badge";
 
 export const taskSchema = z.object({
   id: z.string(),
@@ -77,6 +78,7 @@ export const taskSchema = z.object({
   description: z.string(),
   status: z.enum(["todo", "in_progress", "completed"]),
   priority: z.enum(priorities),
+  dueDate: z.string().nullable(),
   createdAt: z.string(),
 });
 
@@ -118,6 +120,7 @@ function TaskCellViewer({ task }: { task: Task }) {
   const [description, setDescription] = useState(task.description);
   const [status, setStatus] = useState(task.status);
   const [priority, setPriority] = useState<Priority>(task.priority);
+  const [dueDate, setDueDate] = useState(task.dueDate || "");
   const [open, setOpen] = useState(false);
 
   const handleSubmit = (e: FormEvent) => {
@@ -130,6 +133,7 @@ function TaskCellViewer({ task }: { task: Task }) {
           description,
           status,
           priority,
+          dueDate: dueDate || null,
         })
         .then(() => setOpen(false)),
       {
@@ -211,6 +215,15 @@ function TaskCellViewer({ task }: { task: Task }) {
               </Select>
             </div>
             <div className="flex flex-col gap-3">
+              <Label htmlFor="dueDate">Due Date</Label>
+              <Input
+                id="dueDate"
+                type="datetime-local"
+                value={dueDate ? dueDate.slice(0, 16) : ""}
+                onChange={(e) => setDueDate(e.target.value ? new Date(e.target.value).toISOString() : "")}
+              />
+            </div>
+            <div className="flex flex-col gap-3">
               <Label>Created At</Label>
               <div className="text-muted-foreground">
                 {formatDate(task.createdAt)}
@@ -239,6 +252,7 @@ function ActionsCell({ task }: { task: Task }) {
   const [description, setDescription] = useState(task.description);
   const [status, setStatus] = useState(task.status);
   const [priority, setPriority] = useState<Priority>(task.priority);
+  const [dueDate, setDueDate] = useState(task.dueDate || "");
   const [open, setOpen] = useState(false);
 
   const handleDelete = () => {
@@ -259,6 +273,7 @@ function ActionsCell({ task }: { task: Task }) {
           description,
           status,
           priority,
+          dueDate: dueDate || null,
         })
         .then(() => setOpen(false)),
       {
@@ -362,6 +377,15 @@ function ActionsCell({ task }: { task: Task }) {
               </Select>
             </div>
             <div className="flex flex-col gap-3">
+              <Label htmlFor={`edit-dueDate-${task.id}`}>Due Date</Label>
+              <Input
+                id={`edit-dueDate-${task.id}`}
+                type="datetime-local"
+                value={dueDate ? dueDate.slice(0, 16) : ""}
+                onChange={(e) => setDueDate(e.target.value ? new Date(e.target.value).toISOString() : "")}
+              />
+            </div>
+            <div className="flex flex-col gap-3">
               <Label>Created At</Label>
               <div className="text-muted-foreground">
                 {formatDate(task.createdAt)}
@@ -444,6 +468,19 @@ const columns: ColumnDef<Task>[] = [
     cell: ({ row }) => <PriorityBadge priority={row.original.priority} />,
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id));
+    },
+  },
+  {
+    accessorKey: "dueDate",
+    header: "Due Date",
+    cell: ({ row }) => <DueDateBadge dueDate={row.original.dueDate} />,
+    sortingFn: (rowA, rowB) => {
+      const a = rowA.original.dueDate;
+      const b = rowB.original.dueDate;
+      if (!a && !b) return 0;
+      if (!a) return 1;
+      if (!b) return -1;
+      return new Date(a).getTime() - new Date(b).getTime();
     },
   },
   {

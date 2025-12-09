@@ -11,6 +11,7 @@ const taskSchema = z.object({
   description: z.string(),
   status: z.enum(["todo", "in_progress", "completed"]),
   priority: z.enum(priorities),
+  dueDate: z.string().nullable(),
   createdAt: z.string(),
 });
 

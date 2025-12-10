@@ -5,12 +5,14 @@ import { KanbanBoard } from "@/components/kanban-board";
 import { SectionCards } from "@/components/section-cards";
 import { SiteHeader } from "@/components/site-header";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { useDocumentTitle } from "@/hooks/use-document-title";
 import { useTasksQuery } from "@/hooks/use-tasks-query";
+import { useTagFilter } from "@/hooks/use-tag-filter";
 import { createFileRoute } from "@tanstack/react-router";
-import { IconLayoutKanban, IconTable } from "@tabler/icons-react";
-import { useState, useEffect } from "react";
+import { IconLayoutKanban, IconTable, IconX } from "@tabler/icons-react";
+import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence, type Easing } from "framer-motion";
 
 export const Route = createFileRoute("/_protected/dashboard/")({
@@ -51,6 +53,19 @@ function RouteComponent() {
   });
 
   const { data: tasksData } = useTasksQuery();
+  const { selectedTagIds, clearTagFilters } = useTagFilter();
+
+  // Filter tasks by selected tags
+  const filteredTasks = useMemo(() => {
+    const allTasks = tasksData?.tasks || [];
+    if (selectedTagIds.length === 0) return allTasks;
+    
+    return allTasks.filter((task) => {
+      if (!task.tags || task.tags.length === 0) return false;
+      // Task must have at least one of the selected tags
+      return task.tags.some((tag) => selectedTagIds.includes(tag.id));
+    });
+  }, [tasksData?.tasks, selectedTagIds]);
 
   useEffect(() => {
     localStorage.setItem("dashboard-view", viewMode);
@@ -94,14 +109,42 @@ function RouteComponent() {
                 variants={fadeInUp}
                 className="flex items-center justify-between gap-4 px-4 lg:px-6"
               >
-                <motion.h2 
-                  className="text-lg font-semibold"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.3 }}
-                >
-                  Tasks Overview
-                </motion.h2>
+                <div className="flex items-center gap-3">
+                  <motion.h2 
+                    className="text-lg font-semibold"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.3 }}
+                  >
+                    Tasks Overview
+                  </motion.h2>
+                  {/* Active Tag Filter Indicator */}
+                  <AnimatePresence>
+                    {selectedTagIds.length > 0 && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.8 }}
+                        className="flex items-center gap-2"
+                      >
+                        <Badge variant="secondary" className="gap-1 pl-2 pr-1">
+                          <span>
+                            Filtered by {selectedTagIds.length} tag{selectedTagIds.length > 1 ? "s" : ""}
+                          </span>
+                          <button
+                            onClick={clearTagFilters}
+                            className="ml-1 rounded-sm hover:bg-muted p-0.5"
+                          >
+                            <IconX className="h-3 w-3" />
+                          </button>
+                        </Badge>
+                        <span className="text-sm text-muted-foreground">
+                          ({filteredTasks.length} task{filteredTasks.length !== 1 ? "s" : ""})
+                        </span>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
                 <div className="flex items-center gap-1 bg-muted/50 p-1 rounded-lg">
                   <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                     <Button
@@ -157,7 +200,7 @@ function RouteComponent() {
                     exit="exit"
                     className="px-4 lg:px-6"
                   >
-                    <KanbanBoard tasks={tasksData?.tasks || []} />
+                    <KanbanBoard tasks={filteredTasks} />
                   </motion.div>
                 )}
               </AnimatePresence>

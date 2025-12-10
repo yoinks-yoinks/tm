@@ -68,7 +68,8 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useTasksQuery, type Task } from "@/hooks/use-tasks-query";
 import { useUpdateTaskMutation } from "@/hooks/use-update-task-mutation";
 import { useUpdateTaskTagsMutation } from "@/hooks/use-update-task-tags-mutation";
-import { FormEvent, useEffect, useState } from "react";
+import { useTagFilter } from "@/hooks/use-tag-filter";
+import { FormEvent, useEffect, useState, useMemo } from "react";
 import { type Priority } from "@/constants/priority";
 import { PriorityBadge } from "./priority-badge";
 import { DueDateBadge } from "./due-date-badge";
@@ -563,7 +564,7 @@ const columns: ColumnDef<Task>[] = [
 
 export function DataTable() {
   const { data, isPending, isError } = useTasksQuery();
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const { selectedTagIds } = useTagFilter();
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -572,11 +573,17 @@ export function DataTable() {
     pageSize: 10,
   });
 
-  useEffect(() => {
-    if (data?.tasks) {
-      setTasks(data.tasks);
-    }
-  }, [data]);
+  // Filter tasks by selected tags
+  const tasks = useMemo(() => {
+    const allTasks = data?.tasks || [];
+    if (selectedTagIds.length === 0) return allTasks;
+    
+    return allTasks.filter((task) => {
+      if (!task.tags || task.tags.length === 0) return false;
+      // Task must have at least one of the selected tags
+      return task.tags.some((tag) => selectedTagIds.includes(tag.id));
+    });
+  }, [data?.tasks, selectedTagIds]);
 
   const table = useReactTable({
     data: tasks,

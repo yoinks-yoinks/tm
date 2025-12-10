@@ -5,6 +5,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { CommandMenu } from "@/components/command-menu";
 import { KeyboardShortcuts } from "@/components/keyboard-shortcuts";
+import { AIUsageIndicator } from "@/components/ai-usage-indicator";
 import { IconCommand, IconSearch, IconKeyboard } from "@tabler/icons-react";
 
 export function SiteHeader() {
@@ -56,6 +57,7 @@ export function SiteHeader() {
               <IconKeyboard className="h-4 w-4" />
               <span className="sr-only">Keyboard shortcuts</span>
             </Button>
+            <AIUsageIndicator />
             <ThemeToggle />
             <Button variant="ghost" asChild size="sm" className="hidden sm:flex">
               <a

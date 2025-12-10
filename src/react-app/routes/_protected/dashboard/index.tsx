@@ -128,11 +128,11 @@ function RouteComponent() {
               {/* View Mode Toggle */}
               <motion.div 
                 variants={fadeInUp}
-                className="flex items-center justify-between gap-4 px-4 lg:px-6"
+                className="flex flex-col gap-3 px-4 lg:px-6 sm:flex-row sm:items-center sm:justify-between"
               >
-                <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                   <motion.h2 
-                    className="text-lg font-semibold"
+                    className="text-base sm:text-lg font-semibold whitespace-nowrap"
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.3 }}
@@ -146,12 +146,11 @@ function RouteComponent() {
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.8 }}
-                        className="flex items-center gap-2"
+                        className="flex items-center gap-1 sm:gap-2"
                       >
-                        <Badge variant="secondary" className="gap-1 pl-2 pr-1">
-                          <span>
-                            Filtered by {selectedTagIds.length} tag{selectedTagIds.length > 1 ? "s" : ""}
-                          </span>
+                        <Badge variant="secondary" className="gap-1 pl-2 pr-1 text-xs sm:text-sm">
+                          <span className="hidden xs:inline">Filtered by </span>
+                          <span>{selectedTagIds.length} tag{selectedTagIds.length > 1 ? "s" : ""}</span>
                           <button
                             onClick={clearTagFilters}
                             className="ml-1 rounded-sm hover:bg-muted p-0.5"
@@ -159,8 +158,8 @@ function RouteComponent() {
                             <IconX className="h-3 w-3" />
                           </button>
                         </Badge>
-                        <span className="text-sm text-muted-foreground">
-                          ({filteredTasks.length} task{filteredTasks.length !== 1 ? "s" : ""})
+                        <span className="text-xs sm:text-sm text-muted-foreground">
+                          ({filteredTasks.length})
                         </span>
                       </motion.div>
                     )}
@@ -173,14 +172,14 @@ function RouteComponent() {
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.8 }}
                       >
-                        <Badge variant="outline" className="gap-1">
-                          Searching: "{searchQuery}"
+                        <Badge variant="outline" className="gap-1 text-xs sm:text-sm max-w-[150px] truncate">
+                          "{searchQuery}"
                         </Badge>
                       </motion.div>
                     )}
                   </AnimatePresence>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 -mx-4 px-4 sm:mx-0 sm:px-0 sm:overflow-visible">
                   {/* Search Input */}
                   <SearchInput
                     value={searchQuery}
@@ -195,20 +194,20 @@ function RouteComponent() {
                   />
                   
                   {/* View Mode Toggle */}
-                  <div className="flex items-center gap-1 bg-muted/50 p-1 rounded-lg">
+                  <div className="flex items-center gap-0.5 sm:gap-1 bg-muted/50 p-0.5 sm:p-1 rounded-lg shrink-0">
                     <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                       <Button
                         variant={viewMode === "table" ? "secondary" : "ghost"}
                         size="sm"
                         onClick={() => setViewMode("table")}
-                        className={`transition-all duration-200 ${
+                        className={`transition-all duration-200 h-8 px-2 sm:px-3 ${
                           viewMode === "table" 
                             ? "shadow-sm bg-background" 
                             : "hover:bg-muted"
                         }`}
                       >
-                        <IconTable className="h-4 w-4 mr-1" />
-                        Table
+                        <IconTable className="h-4 w-4 sm:mr-1" />
+                        <span className="hidden sm:inline">Table</span>
                       </Button>
                     </motion.div>
                     <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
@@ -216,14 +215,14 @@ function RouteComponent() {
                         variant={viewMode === "kanban" ? "secondary" : "ghost"}
                         size="sm"
                         onClick={() => setViewMode("kanban")}
-                        className={`transition-all duration-200 ${
+                        className={`transition-all duration-200 h-8 px-2 sm:px-3 ${
                           viewMode === "kanban" 
                             ? "shadow-sm bg-background" 
                             : "hover:bg-muted"
                         }`}
                       >
-                        <IconLayoutKanban className="h-4 w-4 mr-1" />
-                        Kanban
+                        <IconLayoutKanban className="h-4 w-4 sm:mr-1" />
+                        <span className="hidden sm:inline">Kanban</span>
                       </Button>
                     </motion.div>
                   </div>

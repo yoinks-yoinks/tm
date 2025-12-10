@@ -4,7 +4,8 @@ import {
   DragOverEvent,
   DragOverlay,
   DragStartEvent,
-  PointerSensor,
+  MouseSensor,
+  TouchSensor,
   useSensor,
   useSensors,
   closestCorners,
@@ -33,9 +34,15 @@ export function KanbanBoard({ tasks }: KanbanBoardProps) {
   const updateMutation = useUpdateTaskMutation();
 
   const sensors = useSensors(
-    useSensor(PointerSensor, {
+    useSensor(MouseSensor, {
       activationConstraint: {
         distance: 8,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 200,
+        tolerance: 5,
       },
     })
   );
@@ -113,15 +120,16 @@ export function KanbanBoard({ tasks }: KanbanBoardProps) {
       onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
     >
-      <div className="flex gap-4 overflow-x-auto pb-4">
+      <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-4 -mx-4 px-4 sm:mx-0 sm:px-0 snap-x snap-mandatory">
         {columns.map((column, index) => (
-          <KanbanColumn
-            key={column.id}
-            id={column.id}
-            title={column.title}
-            tasks={getTasksByStatus(column.id)}
-            index={index}
-          />
+          <div key={column.id} className="snap-start">
+            <KanbanColumn
+              id={column.id}
+              title={column.title}
+              tasks={getTasksByStatus(column.id)}
+              index={index}
+            />
+          </div>
         ))}
       </div>
       <DragOverlay>

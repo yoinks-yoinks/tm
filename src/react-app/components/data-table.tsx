@@ -33,24 +33,12 @@ import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer";
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -60,6 +48,8 @@ import {
 } from "@/components/ui/select";
 import { EmptyState } from "@/components/empty-state";
 import { TableSkeleton } from "@/components/loading-skeletons";
+import { EditTaskDrawer } from "@/components/edit-task-drawer";
+import { Label } from "@/components/ui/label";
 import {
   Table,
   TableBody,
@@ -69,16 +59,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Textarea } from "@/components/ui/textarea";
-import { TagCombobox, type BaseTag } from "@/components/tag-combobox";
 import { useDeleteTaskMutation } from "@/hooks/use-delete-task-mutation";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { useTasksQuery, type Task } from "@/hooks/use-tasks-query";
 import { useUpdateTaskMutation } from "@/hooks/use-update-task-mutation";
-import { useUpdateTaskTagsMutation } from "@/hooks/use-update-task-tags-mutation";
 import { useTagFilter } from "@/hooks/use-tag-filter";
-import { FormEvent, useEffect, useState, useMemo } from "react";
-import { type Priority } from "@/constants/priority";
+import { useState, useMemo } from "react";
 import { PriorityBadge } from "./priority-badge";
 import { DueDateBadge } from "./due-date-badge";
 import { TagBadge } from "./tag-badge";
@@ -166,177 +151,21 @@ function SortableHeader<TData>({ column, title }: SortableHeaderProps<TData>) {
 }
 
 function TaskCellViewer({ task }: { task: Task }) {
-  const isMobile = useIsMobile();
-  const updateMutation = useUpdateTaskMutation();
-  const updateTagsMutation = useUpdateTaskTagsMutation();
-  const [title, setTitle] = useState(task.title);
-  const [description, setDescription] = useState(task.description);
-  const [status, setStatus] = useState(task.status);
-  const [priority, setPriority] = useState<Priority>(task.priority);
-  const [dueDate, setDueDate] = useState(task.dueDate || "");
-  const [selectedTags, setSelectedTags] = useState<BaseTag[]>(task.tags || []);
-  const [open, setOpen] = useState(false);
-
-  // Sync tags when task changes
-  useEffect(() => {
-    setSelectedTags(task.tags || []);
-  }, [task.tags]);
-
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    
-    try {
-      await updateMutation.mutateAsync({
-        id: task.id,
-        title,
-        description,
-        status,
-        priority,
-        dueDate: dueDate || null,
-      });
-
-      // Update tags if changed
-      const currentTagIds = (task.tags || []).map(t => t.id).sort().join(',');
-      const newTagIds = selectedTags.map(t => t.id).sort().join(',');
-      if (currentTagIds !== newTagIds) {
-        await updateTagsMutation.mutateAsync({
-          taskId: task.id,
-          tagIds: selectedTags.map(t => t.id),
-        });
-      }
-
-      setOpen(false);
-      toast.success("Task updated successfully");
-    } catch {
-      toast.error("Failed to update task");
-    }
-  };
-
   return (
-    <Drawer
-      open={open}
-      onOpenChange={setOpen}
-      direction={isMobile ? "bottom" : "right"}
-    >
-      <DrawerTrigger asChild>
+    <EditTaskDrawer
+      task={task}
+      trigger={
         <Button variant="link" className="text-foreground w-fit px-0 text-left">
           {task.title}
         </Button>
-      </DrawerTrigger>
-      <DrawerContent>
-        <DrawerHeader className="gap-1">
-          <DrawerTitle>Edit Task</DrawerTitle>
-          <DrawerDescription>
-            Make changes to your task here. Click save when you're done.
-          </DrawerDescription>
-        </DrawerHeader>
-        <div className="flex flex-col gap-4 overflow-y-auto px-4 text-sm">
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <div className="flex flex-col gap-3">
-              <Label htmlFor="title">Title</Label>
-              <Input
-                id="title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-              />
-            </div>
-            <div className="flex flex-col gap-3">
-              <Label htmlFor="description">Description</Label>
-              <Textarea
-                id="description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                rows={4}
-              />
-            </div>
-            <div className="flex flex-col gap-3">
-              <Label htmlFor="status">Status</Label>
-              <Select
-                value={status}
-                onValueChange={(value) => setStatus(value as Task["status"])}
-              >
-                <SelectTrigger id="status" className="w-full">
-                  <SelectValue placeholder="Select a status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="todo">To Do</SelectItem>
-                  <SelectItem value="in_progress">In Progress</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex flex-col gap-3">
-              <Label htmlFor="priority">Priority</Label>
-              <Select
-                value={priority}
-                onValueChange={(value) => setPriority(value as Priority)}
-              >
-                <SelectTrigger id="priority" className="w-full">
-                  <SelectValue placeholder="Select a priority" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="low">Low</SelectItem>
-                  <SelectItem value="medium">Medium</SelectItem>
-                  <SelectItem value="high">High</SelectItem>
-                  <SelectItem value="urgent">Urgent</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex flex-col gap-3">
-              <Label htmlFor="dueDate">Due Date</Label>
-              <Input
-                id="dueDate"
-                type="datetime-local"
-                value={dueDate ? dueDate.slice(0, 16) : ""}
-                onChange={(e) => setDueDate(e.target.value ? new Date(e.target.value).toISOString() : "")}
-              />
-            </div>
-            <div className="flex flex-col gap-3">
-              <Label>Tags</Label>
-              <TagCombobox
-                selectedTags={selectedTags}
-                onTagsChange={setSelectedTags}
-                placeholder="Select or create tags..."
-              />
-            </div>
-            <div className="flex flex-col gap-3">
-              <Label>Created At</Label>
-              <div className="text-muted-foreground">
-                {formatDate(task.createdAt)}
-              </div>
-            </div>
-          </form>
-        </div>
-        <DrawerFooter>
-          <Button onClick={handleSubmit} disabled={updateMutation.isPending || updateTagsMutation.isPending}>
-            {updateMutation.isPending || updateTagsMutation.isPending ? "Saving..." : "Save Changes"}
-          </Button>
-          <DrawerClose asChild>
-            <Button variant="outline">Cancel</Button>
-          </DrawerClose>
-        </DrawerFooter>
-      </DrawerContent>
-    </Drawer>
+      }
+    />
   );
 }
 
 function ActionsCell({ task }: { task: Task }) {
-  const isMobile = useIsMobile();
   const deleteMutation = useDeleteTaskMutation();
-  const updateMutation = useUpdateTaskMutation();
-  const updateTagsMutation = useUpdateTaskTagsMutation();
-  const [title, setTitle] = useState(task.title);
-  const [description, setDescription] = useState(task.description);
-  const [status, setStatus] = useState(task.status);
-  const [priority, setPriority] = useState<Priority>(task.priority);
-  const [dueDate, setDueDate] = useState(task.dueDate || "");
-  const [selectedTags, setSelectedTags] = useState<BaseTag[]>(task.tags || []);
-  const [open, setOpen] = useState(false);
-
-  // Sync tags when task changes
-  useEffect(() => {
-    setSelectedTags(task.tags || []);
-  }, [task.tags]);
+  const [editOpen, setEditOpen] = useState(false);
 
   const handleDelete = () => {
     toast.promise(deleteMutation.mutateAsync(task.id), {
@@ -346,42 +175,8 @@ function ActionsCell({ task }: { task: Task }) {
     });
   };
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    
-    try {
-      await updateMutation.mutateAsync({
-        id: task.id,
-        title,
-        description,
-        status,
-        priority,
-        dueDate: dueDate || null,
-      });
-
-      // Update tags if changed
-      const currentTagIds = (task.tags || []).map(t => t.id).sort().join(',');
-      const newTagIds = selectedTags.map(t => t.id).sort().join(',');
-      if (currentTagIds !== newTagIds) {
-        await updateTagsMutation.mutateAsync({
-          taskId: task.id,
-          tagIds: selectedTags.map(t => t.id),
-        });
-      }
-
-      setOpen(false);
-      toast.success("Task updated successfully");
-    } catch {
-      toast.error("Failed to update task");
-    }
-  };
-
   return (
-    <Drawer
-      open={open}
-      onOpenChange={setOpen}
-      direction={isMobile ? "bottom" : "right"}
-    >
+    <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
@@ -394,12 +189,10 @@ function ActionsCell({ task }: { task: Task }) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-36">
-          <DrawerTrigger asChild>
-            <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="gap-2">
-              <IconEdit className="size-4" />
-              Edit
-            </DropdownMenuItem>
-          </DrawerTrigger>
+          <DropdownMenuItem onSelect={() => setEditOpen(true)} className="gap-2">
+            <IconEdit className="size-4" />
+            Edit
+          </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
             variant="destructive"
@@ -412,100 +205,12 @@ function ActionsCell({ task }: { task: Task }) {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      <DrawerContent>
-        <DrawerHeader className="gap-1">
-          <DrawerTitle>Edit Task</DrawerTitle>
-          <DrawerDescription>
-            Make changes to your task here. Click save when you're done.
-          </DrawerDescription>
-        </DrawerHeader>
-        <div className="flex flex-col gap-4 overflow-y-auto px-4 text-sm">
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <div className="flex flex-col gap-3">
-              <Label htmlFor={`edit-title-${task.id}`}>Title</Label>
-              <Input
-                id={`edit-title-${task.id}`}
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-              />
-            </div>
-            <div className="flex flex-col gap-3">
-              <Label htmlFor={`edit-description-${task.id}`}>Description</Label>
-              <Textarea
-                id={`edit-description-${task.id}`}
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                rows={4}
-              />
-            </div>
-            <div className="flex flex-col gap-3">
-              <Label htmlFor={`edit-status-${task.id}`}>Status</Label>
-              <Select
-                value={status}
-                onValueChange={(value) => setStatus(value as Task["status"])}
-              >
-                <SelectTrigger id={`edit-status-${task.id}`} className="w-full">
-                  <SelectValue placeholder="Select a status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="todo">To Do</SelectItem>
-                  <SelectItem value="in_progress">In Progress</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex flex-col gap-3">
-              <Label htmlFor={`edit-priority-${task.id}`}>Priority</Label>
-              <Select
-                value={priority}
-                onValueChange={(value) => setPriority(value as Priority)}
-              >
-                <SelectTrigger id={`edit-priority-${task.id}`} className="w-full">
-                  <SelectValue placeholder="Select a priority" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="low">Low</SelectItem>
-                  <SelectItem value="medium">Medium</SelectItem>
-                  <SelectItem value="high">High</SelectItem>
-                  <SelectItem value="urgent">Urgent</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex flex-col gap-3">
-              <Label htmlFor={`edit-dueDate-${task.id}`}>Due Date</Label>
-              <Input
-                id={`edit-dueDate-${task.id}`}
-                type="datetime-local"
-                value={dueDate ? dueDate.slice(0, 16) : ""}
-                onChange={(e) => setDueDate(e.target.value ? new Date(e.target.value).toISOString() : "")}
-              />
-            </div>
-            <div className="flex flex-col gap-3">
-              <Label>Tags</Label>
-              <TagCombobox
-                selectedTags={selectedTags}
-                onTagsChange={setSelectedTags}
-                placeholder="Select or create tags..."
-              />
-            </div>
-            <div className="flex flex-col gap-3">
-              <Label>Created At</Label>
-              <div className="text-muted-foreground">
-                {formatDate(task.createdAt)}
-              </div>
-            </div>
-          </form>
-        </div>
-        <DrawerFooter>
-          <Button onClick={handleSubmit} disabled={updateMutation.isPending || updateTagsMutation.isPending}>
-            {updateMutation.isPending || updateTagsMutation.isPending ? "Saving..." : "Save Changes"}
-          </Button>
-          <DrawerClose asChild>
-            <Button variant="outline">Cancel</Button>
-          </DrawerClose>
-        </DrawerFooter>
-      </DrawerContent>
-    </Drawer>
+      <EditTaskDrawer
+        task={task}
+        open={editOpen}
+        onOpenChange={setEditOpen}
+      />
+    </>
   );
 }
 
@@ -778,9 +483,10 @@ export function DataTable({ searchQuery = "" }: DataTableProps) {
       </div>
       <TabsContent
         value="outline"
-        className="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6"
+        className="relative flex flex-col gap-4 px-4 lg:px-6"
       >
-        <div className="overflow-hidden rounded-lg border">
+        <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+          <div className="overflow-hidden rounded-lg border min-w-[600px] sm:min-w-0">
           <Table>
             <TableHeader className="bg-muted sticky top-0 z-10">
               {table.getHeaderGroups().map((headerGroup) => (
@@ -857,8 +563,9 @@ export function DataTable({ searchQuery = "" }: DataTableProps) {
               </AnimatePresence>
             </TableBody>
           </Table>
+          </div>
         </div>
-        <div className="flex items-center justify-between px-4">
+        <div className="flex items-center justify-between px-0 sm:px-4">
           <div className="text-muted-foreground hidden flex-1 text-sm lg:flex">
             {table.getFilteredRowModel().rows.length} task(s) total.
           </div>
@@ -937,9 +644,10 @@ export function DataTable({ searchQuery = "" }: DataTableProps) {
       </TabsContent>
       <TabsContent
         value="todo"
-        className="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6"
+        className="relative flex flex-col gap-4 px-4 lg:px-6"
       >
-        <div className="overflow-hidden rounded-lg border">
+        <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+          <div className="overflow-hidden rounded-lg border min-w-[500px] sm:min-w-0">
           <Table>
             <TableHeader className="bg-muted">
               <TableRow>
@@ -978,13 +686,15 @@ export function DataTable({ searchQuery = "" }: DataTableProps) {
               )}
             </TableBody>
           </Table>
+          </div>
         </div>
       </TabsContent>
       <TabsContent
         value="in-progress"
-        className="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6"
+        className="relative flex flex-col gap-4 px-4 lg:px-6"
       >
-        <div className="overflow-hidden rounded-lg border">
+        <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+          <div className="overflow-hidden rounded-lg border min-w-[500px] sm:min-w-0">
           <Table>
             <TableHeader className="bg-muted">
               <TableRow>
@@ -1023,13 +733,15 @@ export function DataTable({ searchQuery = "" }: DataTableProps) {
               )}
             </TableBody>
           </Table>
+          </div>
         </div>
       </TabsContent>
       <TabsContent
         value="completed"
-        className="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6"
+        className="relative flex flex-col gap-4 px-4 lg:px-6"
       >
-        <div className="overflow-hidden rounded-lg border">
+        <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+          <div className="overflow-hidden rounded-lg border min-w-[500px] sm:min-w-0">
           <Table>
             <TableHeader className="bg-muted">
               <TableRow>
@@ -1068,6 +780,7 @@ export function DataTable({ searchQuery = "" }: DataTableProps) {
               )}
             </TableBody>
           </Table>
+          </div>
         </div>
       </TabsContent>
     </Tabs>

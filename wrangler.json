@@ -9,6 +9,15 @@
 	"observability": {
 		"enabled": true
 	},
+	"ai": {
+		"binding": "AI"
+	},
+	"kv_namespaces": [
+		{
+			"binding": "USAGE_KV",
+			"id": "f22c2e68f3c04962af4d0af39cf370eb"
+		}
+	],
 	"d1_databases": [
 		{
 			"binding": "DB",

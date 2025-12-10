@@ -66,7 +66,7 @@ export function KanbanColumn({ id, title, tasks, className, index }: KanbanColum
       initial="hidden"
       animate="visible"
       className={cn(
-        "flex flex-col rounded-xl min-h-[500px] w-80 overflow-hidden border",
+        "flex flex-col rounded-xl min-h-[400px] sm:min-h-[500px] w-[280px] sm:w-80 shrink-0 overflow-hidden border",
         config.borderColor,
         className
       )}

@@ -17,17 +17,16 @@ import {
 } from "@/components/ui/carousel";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { ThemeToggle } from "@/components/theme-toggle";
 import {
   ListTodo,
   Zap,
-  Users,
   Calendar,
   ArrowRight,
   Star,
   BarChart3,
   Clock,
   CheckCircle2,
-  Shield,
   Sparkles,
   Target,
   TrendingUp,
@@ -39,6 +38,8 @@ import {
   Play,
   Menu,
   X,
+  Mic,
+  Globe,
 } from "lucide-react";
 import { getSession } from "@/lib/auth-client";
 import { motion, useInView, AnimatePresence, type Easing } from "framer-motion";
@@ -113,94 +114,106 @@ function useCounter(end: number, duration: number = 2000) {
 // Data
 const features = [
   {
-    icon: <Zap className="h-6 w-6" />,
-    title: "Lightning Fast",
-    description: "Instant updates and real-time collaboration keep your team in sync.",
-    gradient: "from-yellow-500 to-orange-500",
+    icon: <Mic className="h-6 w-6" />,
+    title: "Voice Input",
+    description: "Speak to create tasks in 15+ languages including Urdu, Pashto, Balochi, and regional Pakistani languages.",
+    gradient: "from-rose-500 to-pink-500",
   },
   {
-    icon: <Users className="h-6 w-6" />,
-    title: "Team Collaboration",
-    description: "Work together seamlessly with shared workspaces and team features.",
+    icon: <Globe className="h-6 w-6" />,
+    title: "Multi-Language Support",
+    description: "AI-powered transcription supporting English, Urdu, Punjabi, Sindhi, Pashto, Balochi, Shina, Khowar & more.",
+    gradient: "from-emerald-500 to-teal-500",
+  },
+  {
+    icon: <ListTodo className="h-6 w-6" />,
+    title: "Task Management",
+    description: "Create, edit, and organize tasks with priorities, due dates, and descriptions.",
     gradient: "from-blue-500 to-cyan-500",
   },
   {
-    icon: <Calendar className="h-6 w-6" />,
-    title: "Smart Scheduling",
-    description: "AI-powered scheduling helps you prioritize and meet deadlines.",
+    icon: <Target className="h-6 w-6" />,
+    title: "Kanban Boards",
+    description: "Touch-friendly drag-and-drop task organization with smooth animations.",
     gradient: "from-purple-500 to-pink-500",
   },
   {
     icon: <BarChart3 className="h-6 w-6" />,
-    title: "Analytics & Insights",
-    description: "Track progress and productivity with detailed analytics.",
+    title: "Dashboard Analytics",
+    description: "Real-time stats with animated counters and progress tracking.",
     gradient: "from-green-500 to-emerald-500",
   },
   {
-    icon: <Target className="h-6 w-6" />,
-    title: "Goal Tracking",
-    description: "Set and achieve goals with visual progress indicators.",
+    icon: <Sparkles className="h-6 w-6" />,
+    title: "Smart Tags & Labels",
+    description: "Color-coded tags with filtering to organize tasks your way.",
+    gradient: "from-yellow-500 to-orange-500",
+  },
+  {
+    icon: <Calendar className="h-6 w-6" />,
+    title: "Due Date Tracking",
+    description: "Calendar picker with smart overdue detection and relative dates.",
     gradient: "from-red-500 to-rose-500",
   },
   {
-    icon: <Shield className="h-6 w-6" />,
-    title: "Enterprise Security",
-    description: "Bank-level encryption and compliance for your sensitive data.",
+    icon: <Zap className="h-6 w-6" />,
+    title: "Keyboard Shortcuts",
+    description: "Power user shortcuts with Cmd+K command palette for fast navigation.",
     gradient: "from-indigo-500 to-violet-500",
   },
   {
     icon: <Moon className="h-6 w-6" />,
-    title: "Dark Mode",
-    description: "Easy on the eyes with beautiful dark and light themes.",
+    title: "Dark & Light Mode",
+    description: "Beautiful themes that adapt to your preference automatically.",
     gradient: "from-slate-500 to-gray-500",
   },
   {
     icon: <TrendingUp className="h-6 w-6" />,
-    title: "Productivity Boost",
-    description: "Average 40% increase in team productivity reported.",
+    title: "Priority System",
+    description: "Four-level priority with visual indicators: Urgent, High, Medium, Low.",
     gradient: "from-teal-500 to-cyan-500",
   },
 ];
 
 const testimonials = [
   {
-    quote: "TaskFlow transformed how our team works. We've increased our productivity by 40% since switching.",
-    author: "Sarah Chen",
-    role: "Product Manager",
-    company: "TechCorp",
-    avatar: "SC",
+    quote: "TaskFlow's Kanban board transformed our sprint planning. The drag-and-drop is incredibly smooth.",
+    author: "Ahmed Hassan",
+    role: "Tech Lead",
+    company: "Islamabad Tech",
+    avatar: "AH",
     rating: 5,
   },
   {
-    quote: "The best task management tool we've ever used. Simple, powerful, and beautiful.",
-    author: "Mike Johnson",
-    role: "CEO",
-    company: "StartupXYZ",
-    avatar: "MJ",
+    quote: "The priority system and due date tracking help me never miss a deadline. Confetti on completion is a nice touch!",
+    author: "Fatima Khan",
+    role: "Project Manager",
+    company: "Karachi Digital",
+    avatar: "FK",
     rating: 5,
   },
   {
-    quote: "Finally, a tool that our entire team actually enjoys using. The collaboration features are incredible.",
-    author: "Emily Rodriguez",
-    role: "Team Lead",
-    company: "DesignStudio",
-    avatar: "ER",
+    quote: "Clean interface with powerful features. The command palette saves me so much time navigating.",
+    author: "Bilal Ahmed",
+    role: "Software Engineer",
+    company: "Lahore Solutions",
+    avatar: "BA",
     rating: 5,
   },
   {
-    quote: "The Kanban boards and real-time updates have revolutionized our workflow.",
-    author: "David Kim",
-    role: "Engineering Manager",
-    company: "CloudTech",
-    avatar: "DK",
+    quote: "Finally a task manager that looks beautiful in dark mode. The animations make it enjoyable to use.",
+    author: "Sara Malik",
+    role: "UI/UX Designer",
+    company: "Creative Studio",
+    avatar: "SM",
     rating: 5,
   },
   {
-    quote: "We evaluated 10+ tools before choosing TaskFlow. Best decision we made all year.",
-    author: "Lisa Wang",
-    role: "Operations Director",
-    company: "ScaleUp Inc",
-    avatar: "LW",
+    quote: "The tag filtering system is exactly what we needed to organize our complex workflows.",
+    author: "Usman Ali",
+    role: "Operations Manager",
+    company: "Peshawar Logistics",
+    avatar: "UA",
     rating: 5,
   },
 ];
@@ -208,114 +221,92 @@ const testimonials = [
 const howItWorks = [
   {
     step: 1,
-    title: "Sign Up",
-    description: "Create your free account in seconds. No credit card required.",
+    title: "Create Account",
+    description: "Sign up with email in seconds. Password strength indicator helps you stay secure.",
     icon: <Sparkles className="h-8 w-8" />,
   },
   {
     step: 2,
-    title: "Create Tasks",
-    description: "Add tasks with priorities, due dates, and custom tags.",
+    title: "Add Tasks",
+    description: "Create tasks with title, description, priority, due dates, and color-coded tags.",
     icon: <ListTodo className="h-8 w-8" />,
   },
   {
     step: 3,
     title: "Organize",
-    description: "Use Kanban boards or lists to manage your workflow.",
+    description: "Use the Kanban board to drag tasks between To Do, In Progress, and Completed.",
     icon: <Target className="h-8 w-8" />,
   },
   {
     step: 4,
     title: "Track Progress",
-    description: "Monitor completion rates and stay on schedule.",
+    description: "Monitor your completion rate on the dashboard with animated stats cards.",
     icon: <TrendingUp className="h-8 w-8" />,
   },
 ];
 
 const pricingPlans = [
   {
-    name: "Free",
+    name: "Free Forever",
     price: "$0",
-    period: "forever",
-    description: "Perfect for personal use",
-    features: [
-      "Up to 50 tasks",
-      "1 user",
-      "Basic features",
-      "Email support",
-      "Mobile app access",
-    ],
-    cta: "Get Started Free",
-    popular: false,
-  },
-  {
-    name: "Pro",
-    price: "$9",
-    period: "/month",
-    description: "For growing teams",
+    period: "",
+    description: "Everything you need to get started",
     features: [
       "Unlimited tasks",
-      "Up to 10 users",
-      "All features",
-      "Priority support",
-      "Advanced analytics",
-      "Custom integrations",
+      "Voice input in 15+ languages",
+      "AI-powered transcription",
+      "Kanban board view",
+      "Table view with sorting",
+      "Custom tags & colors",
+      "Priority levels",
+      "Due date tracking",
+      "Dark & light mode",
+      "Keyboard shortcuts",
+      "Mobile-optimized UI",
     ],
-    cta: "Start Free Trial",
+    cta: "Get Started Free",
     popular: true,
-  },
-  {
-    name: "Enterprise",
-    price: "Custom",
-    period: "",
-    description: "For large organizations",
-    features: [
-      "Unlimited everything",
-      "Unlimited users",
-      "SSO/SAML",
-      "Dedicated support",
-      "Custom contracts",
-      "SLA guarantee",
-    ],
-    cta: "Contact Sales",
-    popular: false,
   },
 ];
 
 const faqs = [
   {
-    question: "Is there a free trial?",
-    answer: "Yes! Our Free plan is free forever, and you can try Pro features with a 14-day free trial. No credit card required.",
+    question: "Is TaskFlow really free?",
+    answer: "Yes! TaskFlow is completely free with all features included, including AI voice input. No credit card required.",
   },
   {
-    question: "Can I cancel anytime?",
-    answer: "Absolutely. You can cancel your subscription at any time with no cancellation fees. Your data will be preserved for 30 days.",
+    question: "How does voice input work?",
+    answer: "Click the microphone icon when creating a task, speak in your preferred language, and the AI will transcribe your speech into text automatically.",
   },
   {
-    question: "How secure is my data?",
-    answer: "We use bank-level 256-bit encryption, SOC 2 compliance, and regular security audits. Your data is stored in secure, redundant data centers.",
+    question: "Which languages are supported for voice input?",
+    answer: "We support 15+ languages including English, Urdu, Pashto, Punjabi, Sindhi, Balochi, Shina, Khowar, Burushaski, Balti, Wakhi, and more regional Pakistani languages.",
   },
   {
-    question: "Does it work on mobile?",
-    answer: "Yes! TaskFlow works beautifully on all devices. We have native iOS and Android apps, plus a fully responsive web app.",
+    question: "How do I use the Kanban board?",
+    answer: "Simply drag and drop tasks between columns (To Do, In Progress, Completed). Works with both mouse and touch on mobile.",
   },
   {
-    question: "Can I import from other tools?",
-    answer: "Yes, we support importing from Trello, Asana, Monday, Notion, and CSV files. Migration takes just a few clicks.",
+    question: "What are keyboard shortcuts?",
+    answer: "Press Cmd/Ctrl+K to open the command palette for quick navigation. Press Ctrl+/ to see all available shortcuts.",
   },
   {
-    question: "Is there an API?",
-    answer: "Yes! Our REST API allows you to build custom integrations. We also have pre-built integrations with popular tools.",
+    question: "Can I organize tasks with tags?",
+    answer: "Yes! Create custom color-coded tags and filter tasks by tag. You can add multiple tags to each task.",
+  },
+  {
+    question: "Is there a dark mode?",
+    answer: "Yes! Toggle between dark and light themes using the theme switcher in the header. Your preference is saved automatically.",
   },
 ];
 
-const integrations = [
-  { name: "Slack", icon: "🔔" },
-  { name: "GitHub", icon: "🐙" },
-  { name: "Google", icon: "🔍" },
-  { name: "Notion", icon: "📝" },
-  { name: "Figma", icon: "🎨" },
-  { name: "Zapier", icon: "⚡" },
+const techStack = [
+  { name: "React 19", icon: "⚛️" },
+  { name: "TypeScript", icon: "📘" },
+  { name: "Cloudflare", icon: "☁️" },
+  { name: "Tailwind", icon: "🎨" },
+  { name: "Framer", icon: "✨" },
+  { name: "shadcn/ui", icon: "🧩" },
 ];
 
 function LandingPage() {
@@ -360,6 +351,7 @@ function LandingPage() {
           </div>
 
           <div className="hidden md:flex items-center gap-3">
+            <ThemeToggle />
             <Button variant="ghost" asChild>
               <Link to="/login">Sign In</Link>
             </Button>
@@ -374,12 +366,15 @@ function LandingPage() {
           </div>
 
           {/* Mobile Menu Button */}
-          <button
-            className="md:hidden p-2"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
-            {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </button>
+          <div className="md:hidden flex items-center gap-2">
+            <ThemeToggle />
+            <button
+              className="p-2"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
+              {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
+          </div>
         </div>
 
         {/* Mobile Menu */}
@@ -479,22 +474,22 @@ function LandingPage() {
           >
             <motion.div variants={fadeInUp}>
               <Badge variant="secondary" className="mb-6 px-4 py-2 text-sm">
-                <Sparkles className="mr-2 h-4 w-4 text-yellow-500" />
-                <span>Trusted by 10,000+ teams worldwide</span>
+                <Mic className="mr-2 h-4 w-4 text-rose-500" />
+                <span>Now with Voice Input in 15+ Languages</span>
               </Badge>
             </motion.div>
 
             <motion.h1
               variants={fadeInUp}
-              className="mx-auto max-w-4xl text-4xl font-bold tracking-tight sm:text-6xl lg:text-7xl"
+              className="mx-auto max-w-4xl text-3xl font-bold tracking-tight sm:text-5xl lg:text-7xl"
             >
               Manage tasks with{" "}
               <span className="relative">
                 <span className="bg-linear-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent animate-gradient">
-                  clarity and ease
+                  voice and ease
                 </span>
                 <motion.span
-                  className="absolute -bottom-2 left-0 right-0 h-3 bg-linear-to-r from-blue-600/20 via-purple-600/20 to-pink-600/20 rounded-full blur-sm"
+                  className="absolute -bottom-1 sm:-bottom-2 left-0 right-0 h-2 sm:h-3 bg-linear-to-r from-blue-600/20 via-purple-600/20 to-pink-600/20 rounded-full blur-sm"
                   animate={{ scaleX: [0, 1] }}
                   transition={{ duration: 0.8, delay: 0.5 }}
                 />
@@ -503,35 +498,35 @@ function LandingPage() {
 
             <motion.p
               variants={fadeInUp}
-              className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground sm:text-xl"
+              className="mx-auto mt-4 sm:mt-6 max-w-2xl text-base sm:text-lg text-muted-foreground lg:text-xl px-2"
             >
-              Streamline your workflow, collaborate seamlessly, and achieve more
-              with our intuitive task management platform. Built for modern teams.
+              Create tasks by speaking in Urdu, Pashto, Balochi, or any of 15+ languages.
+              AI-powered voice transcription meets beautiful task management.
             </motion.p>
 
             <motion.div
               variants={fadeInUp}
-              className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row"
+              className="mt-8 sm:mt-10 flex flex-col items-center justify-center gap-3 sm:gap-4 sm:flex-row px-4"
             >
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="w-full sm:w-auto">
                 <Button
                   size="lg"
-                  className="h-14 px-8 text-base bg-linear-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 shadow-lg shadow-blue-500/25"
+                  className="h-12 sm:h-14 px-6 sm:px-8 text-sm sm:text-base w-full sm:w-auto bg-linear-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 shadow-lg shadow-blue-500/25"
                   asChild
                 >
                   <Link to="/sign-up">
                     Start Free Trial
-                    <ArrowRight className="ml-2 h-5 w-5" />
+                    <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
                   </Link>
                 </Button>
               </motion.div>
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="w-full sm:w-auto">
                 <Button
                   size="lg"
                   variant="outline"
-                  className="h-14 px-8 text-base"
+                  className="h-12 sm:h-14 px-6 sm:px-8 text-sm sm:text-base w-full sm:w-auto"
                 >
-                  <Play className="mr-2 h-5 w-5" />
+                  <Play className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
                   Watch Demo
                 </Button>
               </motion.div>
@@ -551,16 +546,16 @@ function LandingPage() {
             initial={{ opacity: 0, y: 100 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="mt-20 relative"
+            className="mt-12 sm:mt-20 relative"
           >
             <div className="absolute inset-0 bg-linear-to-t from-background via-transparent to-transparent z-10 pointer-events-none" />
             <motion.div
               whileHover={{ y: -5 }}
               transition={{ duration: 0.3 }}
-              className="rounded-2xl border bg-card p-2 shadow-2xl shadow-blue-500/10"
+              className="rounded-xl sm:rounded-2xl border bg-card p-1.5 sm:p-2 shadow-2xl shadow-blue-500/10"
             >
-              <div className="rounded-xl bg-linear-to-br from-muted/50 to-muted p-8">
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+              <div className="rounded-lg sm:rounded-xl bg-linear-to-br from-muted/50 to-muted p-4 sm:p-8">
+                <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-3">
                   {["To Do", "In Progress", "Completed"].map((column, idx) => (
                     <motion.div
                       key={column}
@@ -596,14 +591,14 @@ function LandingPage() {
       </section>
 
       {/* How It Works Section */}
-      <section id="how-it-works" className="py-20 sm:py-32 bg-muted/30">
+      <section id="how-it-works" className="py-16 sm:py-20 lg:py-32 bg-muted/30">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <SectionHeader
             title="How It Works"
             subtitle="Get started in minutes with our simple 4-step process"
           />
 
-          <div className="mt-16 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-10 sm:mt-16 grid grid-cols-1 gap-6 sm:gap-8 sm:grid-cols-2 lg:grid-cols-4">
             {howItWorks.map((step, index) => (
               <HowItWorksCard key={step.step} step={step} index={index} />
             ))}
@@ -612,7 +607,7 @@ function LandingPage() {
       </section>
 
       {/* Features Section - Bento Grid */}
-      <section id="features" className="py-20 sm:py-32">
+      <section id="features" className="py-16 sm:py-20 lg:py-32">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <SectionHeader
             title="Everything you need to stay organized"
@@ -624,7 +619,7 @@ function LandingPage() {
             whileInView="visible"
             viewport={{ once: true, margin: "-100px" }}
             variants={staggerContainer}
-            className="mt-16 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
+            className="mt-10 sm:mt-16 grid grid-cols-1 gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-4"
           >
             {features.map((feature, index) => (
               <FeatureCard key={feature.title} feature={feature} index={index} />
@@ -634,9 +629,9 @@ function LandingPage() {
       </section>
 
       {/* Stats Section */}
-      <section className="border-y bg-linear-to-r from-blue-500/5 via-purple-500/5 to-pink-500/5 py-16">
+      <section className="border-y bg-linear-to-r from-blue-500/5 via-purple-500/5 to-pink-500/5 py-12 sm:py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
+          <div className="grid grid-cols-2 gap-4 sm:gap-8 md:grid-cols-4">
             <AnimatedStatCard number={10000} suffix="+" label="Active Teams" />
             <AnimatedStatCard number={2} suffix="M+" label="Tasks Completed" />
             <AnimatedStatCard number={99.9} suffix="%" label="Uptime" decimal />
@@ -646,14 +641,14 @@ function LandingPage() {
       </section>
 
       {/* Testimonials Section */}
-      <section id="testimonials" className="py-20 sm:py-32">
+      <section id="testimonials" className="py-16 sm:py-20 lg:py-32">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <SectionHeader
             title="Loved by teams everywhere"
             subtitle="See what our customers have to say about their experience."
           />
 
-          <div className="mt-16">
+          <div className="mt-10 sm:mt-16">
             <Carousel
               opts={{
                 align: "start",
@@ -667,9 +662,9 @@ function LandingPage() {
               ]}
               className="w-full"
             >
-              <CarouselContent className="-ml-4">
+              <CarouselContent className="-ml-2 sm:-ml-4">
                 {testimonials.map((testimonial, index) => (
-                  <CarouselItem key={index} className="pl-4 md:basis-1/2 lg:basis-1/3">
+                  <CarouselItem key={index} className="pl-2 sm:pl-4 basis-full sm:basis-1/2 lg:basis-1/3">
                     <TestimonialCard testimonial={testimonial} />
                   </CarouselItem>
                 ))}
@@ -682,7 +677,7 @@ function LandingPage() {
       </section>
 
       {/* Pricing Section */}
-      <section id="pricing" className="py-20 sm:py-32 bg-muted/30">
+      <section id="pricing" className="py-16 sm:py-20 lg:py-32 bg-muted/30">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <SectionHeader
             title="Simple, transparent pricing"
@@ -694,7 +689,7 @@ function LandingPage() {
             whileInView="visible"
             viewport={{ once: true, margin: "-100px" }}
             variants={staggerContainer}
-            className="mt-16 grid grid-cols-1 gap-8 md:grid-cols-3"
+            className="mt-10 sm:mt-16 grid grid-cols-1 gap-6 sm:gap-8 md:grid-cols-3"
           >
             {pricingPlans.map((plan) => (
               <PricingCard key={plan.name} plan={plan} />
@@ -704,7 +699,7 @@ function LandingPage() {
       </section>
 
       {/* FAQ Section */}
-      <section id="faq" className="py-20 sm:py-32">
+      <section id="faq" className="py-16 sm:py-20 lg:py-32">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
           <SectionHeader
             title="Frequently asked questions"
@@ -734,7 +729,7 @@ function LandingPage() {
         </div>
       </section>
 
-      {/* Integrations Section */}
+      {/* Tech Stack Section */}
       <section className="py-16 bg-muted/30">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <motion.div
@@ -744,12 +739,12 @@ function LandingPage() {
             className="text-center"
           >
             <p className="text-sm text-muted-foreground mb-8">
-              Integrates with your favorite tools
+              Built with modern technologies
             </p>
             <div className="flex flex-wrap items-center justify-center gap-8 md:gap-16">
-              {integrations.map((integration, index) => (
+              {techStack.map((tech, index) => (
                 <motion.div
-                  key={integration.name}
+                  key={tech.name}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
@@ -757,8 +752,8 @@ function LandingPage() {
                   whileHover={{ scale: 1.1 }}
                   className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  <span className="text-2xl">{integration.icon}</span>
-                  <span className="font-medium">{integration.name}</span>
+                  <span className="text-2xl">{tech.icon}</span>
+                  <span className="font-medium">{tech.name}</span>
                 </motion.div>
               ))}
             </div>

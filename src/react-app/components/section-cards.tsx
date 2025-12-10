@@ -123,7 +123,7 @@ export function SectionCards() {
 
   if (isPending) {
     return (
-      <div className="grid grid-cols-1 gap-4 px-4 lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 px-4 sm:grid-cols-2 lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
         {Array.from({ length: 4 }).map((_, i) => (
           <Card key={i} className="@container/card overflow-hidden">
             <CardHeader className="relative">
@@ -160,13 +160,22 @@ export function SectionCards() {
     completion: Math.round(completionRate),
   };
 
+  // Calculate progress percentages for each card
+  const progressValues = {
+    total: 100, // Total is always 100%
+    pending: total > 0 ? (pending / total) * 100 : 0,
+    active: total > 0 ? (active / total) * 100 : 0,
+    completion: completionRate,
+  };
+
   return (
-    <div className="grid grid-cols-1 gap-4 px-4 lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
+    <div className="grid grid-cols-1 gap-4 px-4 sm:grid-cols-2 lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
       {statsCards.map((card, index) => (
         <AnimatedCard
           key={card.key}
           card={card}
           value={values[card.key as keyof typeof values]}
+          progressValue={progressValues[card.key as keyof typeof progressValues]}
           index={index}
         />
       ))}
@@ -177,10 +186,12 @@ export function SectionCards() {
 function AnimatedCard({
   card,
   value,
+  progressValue,
   index,
 }: {
   card: (typeof statsCards)[number];
   value: number;
+  progressValue: number;
   index: number;
 }) {
   const { count, ref } = useAnimatedCounter(value);
@@ -217,10 +228,10 @@ function AnimatedCard({
         <CardHeader className="relative z-10">
           <div className="flex items-start justify-between">
             <div>
-              <CardDescription className="text-xs font-medium uppercase tracking-wider">
+              <CardDescription className="text-[10px] sm:text-xs font-medium uppercase tracking-wider">
                 {card.title}
               </CardDescription>
-              <CardTitle className="text-3xl font-bold tabular-nums mt-1 @[250px]/card:text-4xl">
+              <CardTitle className="text-2xl sm:text-3xl font-bold tabular-nums mt-1 @[250px]/card:text-4xl">
                 <span className={`bg-linear-to-r ${card.gradient} bg-clip-text text-transparent`}>
                   {count}
                   {card.isPercentage && "%"}
@@ -238,27 +249,25 @@ function AnimatedCard({
           </div>
         </CardHeader>
         
-        <CardFooter className="flex-col items-start gap-1.5 text-sm relative z-10">
+        <CardFooter className="flex-col items-start gap-1 sm:gap-1.5 text-xs sm:text-sm relative z-10">
           <div className="line-clamp-1 flex gap-2 font-medium items-center">
             {card.trendText}
-            <TrendIcon className={`size-4 ${card.trendIcon === IconTrendingUp ? 'text-green-500' : 'text-orange-500'}`} />
+            <TrendIcon className={`size-3 sm:size-4 ${card.trendIcon === IconTrendingUp ? 'text-green-500' : 'text-orange-500'}`} />
           </div>
-          <div className="text-muted-foreground text-xs">{card.description}</div>
+          <div className="text-muted-foreground text-[10px] sm:text-xs">{card.description}</div>
         </CardFooter>
 
-        {/* Progress bar for completion rate */}
-        {card.isPercentage && (
-          <div className="px-6 pb-4 relative z-10">
-            <div className="h-2 bg-muted rounded-full overflow-hidden">
-              <motion.div
-                className={`h-full bg-linear-to-r ${card.gradient} rounded-full`}
-                initial={{ width: 0 }}
-                animate={{ width: `${value}%` }}
-                transition={{ duration: 1.5, ease: "easeOut", delay: 0.5 }}
-              />
-            </div>
+        {/* Progress bar for all cards */}
+        <div className="px-6 pb-4 relative z-10">
+          <div className="h-2 bg-muted rounded-full overflow-hidden">
+            <motion.div
+              className={`h-full bg-linear-to-r ${card.gradient} rounded-full`}
+              initial={{ width: 0 }}
+              animate={{ width: `${progressValue}%` }}
+              transition={{ duration: 1.5, ease: "easeOut", delay: 0.5 }}
+            />
           </div>
-        )}
+        </div>
       </Card>
     </motion.div>
   );

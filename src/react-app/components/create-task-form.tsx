@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { TagCombobox, type BaseTag } from "@/components/tag-combobox";
+import { VoiceRecorder } from "@/components/voice-recorder";
+import { LanguageSelector } from "@/components/language-selector";
 import { priorities, priorityConfig, type Priority } from "@/constants/priority";
 import {
   createTaskSchema,
@@ -27,6 +29,7 @@ interface CreateTaskFormProps {
 
 export function CreateTaskForm({ onSuccess }: CreateTaskFormProps) {
   const [selectedTags, setSelectedTags] = useState<BaseTag[]>([]);
+  const [voiceLanguage, setVoiceLanguage] = useState("en");
   
   const form = useForm<CreateTaskForm>({
     resolver: zodResolver(createTaskSchema),
@@ -62,12 +65,26 @@ export function CreateTaskForm({ onSuccess }: CreateTaskFormProps) {
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      {/* Language selector for voice input */}
+      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <span>Voice input language:</span>
+        <LanguageSelector value={voiceLanguage} onChange={setVoiceLanguage} compact />
+      </div>
+      
       <div>
-        <Controller
-          name="title"
-          control={form.control}
-          render={({ field }) => <Input {...field} placeholder="Title" />}
-        />
+        <div className="flex gap-2">
+          <Controller
+            name="title"
+            control={form.control}
+            render={({ field }) => <Input {...field} placeholder="Title" className="flex-1" />}
+          />
+          <VoiceRecorder
+            label="Speak title"
+            onTranscription={(text) => form.setValue("title", text)}
+            disabled={isPending}
+            language={voiceLanguage}
+          />
+        </div>
         {form.formState.errors.title && (
           <p className="text-red-500 text-sm mt-1">
             {form.formState.errors.title.message}
@@ -75,13 +92,25 @@ export function CreateTaskForm({ onSuccess }: CreateTaskFormProps) {
         )}
       </div>
       <div>
-        <Controller
-          name="description"
-          control={form.control}
-          render={({ field }) => (
-            <Textarea {...field} placeholder="Description (optional)" />
-          )}
-        />
+        <div className="flex gap-2">
+          <Controller
+            name="description"
+            control={form.control}
+            render={({ field }) => (
+              <Textarea {...field} placeholder="Description (optional)" className="flex-1" />
+            )}
+          />
+          <VoiceRecorder
+            label="Speak description"
+            onTranscription={(text) => {
+              const current = form.getValues("description") || "";
+              form.setValue("description", current ? `${current} ${text}` : text);
+            }}
+            disabled={isPending}
+            language={voiceLanguage}
+            className="self-start mt-1"
+          />
+        </div>
       </div>
       <div>
         <Controller

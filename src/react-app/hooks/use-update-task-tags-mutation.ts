@@ -16,7 +16,7 @@ export const useUpdateTaskTagsMutation = () => {
 
   return useMutation({
     mutationFn: async ({ taskId, tagIds }: UpdateTaskTagsForm) => {
-      await api.put(`${APIEndpoints.Tasks}/${taskId}/tags`, { tagIds });
+      await api.post(`${APIEndpoints.Tasks}/${taskId}/tags`, { tagIds });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [QueryKeys.Tasks] });

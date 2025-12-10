@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,6 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { TagCombobox, type BaseTag } from "@/components/tag-combobox";
 import { priorities, priorityConfig, type Priority } from "@/constants/priority";
 import {
   createTaskSchema,
@@ -24,6 +26,8 @@ interface CreateTaskFormProps {
 }
 
 export function CreateTaskForm({ onSuccess }: CreateTaskFormProps) {
+  const [selectedTags, setSelectedTags] = useState<BaseTag[]>([]);
+  
   const form = useForm<CreateTaskForm>({
     resolver: zodResolver(createTaskSchema),
     defaultValues: {
@@ -31,16 +35,23 @@ export function CreateTaskForm({ onSuccess }: CreateTaskFormProps) {
       description: "",
       priority: "medium",
       dueDate: null,
+      tagIds: [],
     },
   });
 
   const { mutate, isPending } = useCreateTaskMutation();
 
   const onSubmit = (data: CreateTaskForm) => {
-    mutate(data, {
+    const submitData = {
+      ...data,
+      tagIds: selectedTags.map((t) => t.id),
+    };
+    
+    mutate(submitData, {
       onSuccess: () => {
         toast.success("Task created successfully");
         form.reset();
+        setSelectedTags([]);
         onSuccess();
       },
       onError: () => {
@@ -112,6 +123,16 @@ export function CreateTaskForm({ onSuccess }: CreateTaskFormProps) {
               }
             />
           )}
+        />
+      </div>
+      <div>
+        <Label className="text-sm text-muted-foreground mb-1 block">
+          Tags (optional)
+        </Label>
+        <TagCombobox
+          selectedTags={selectedTags}
+          onTagsChange={setSelectedTags}
+          placeholder="Select or create tags..."
         />
       </div>
       <Button type="submit" disabled={isPending} className="w-full">

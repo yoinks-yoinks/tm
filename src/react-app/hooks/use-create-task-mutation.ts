@@ -10,6 +10,7 @@ export const createTaskSchema = z.object({
   description: z.string().optional(),
   priority: z.enum(priorities),
   dueDate: z.string().optional().nullable(),
+  tagIds: z.array(z.string()).optional(),
 });
 
 export type CreateTaskForm = z.infer<typeof createTaskSchema>;

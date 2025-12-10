@@ -62,10 +62,12 @@ import {
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { TagCombobox, type BaseTag } from "@/components/tag-combobox";
 import { useDeleteTaskMutation } from "@/hooks/use-delete-task-mutation";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useTasksQuery, type Task } from "@/hooks/use-tasks-query";
 import { useUpdateTaskMutation } from "@/hooks/use-update-task-mutation";
+import { useUpdateTaskTagsMutation } from "@/hooks/use-update-task-tags-mutation";
 import { FormEvent, useEffect, useState } from "react";
 import { type Priority } from "@/constants/priority";
 import { PriorityBadge } from "./priority-badge";
@@ -104,32 +106,48 @@ function formatDate(dateString: string) {
 function TaskCellViewer({ task }: { task: Task }) {
   const isMobile = useIsMobile();
   const updateMutation = useUpdateTaskMutation();
+  const updateTagsMutation = useUpdateTaskTagsMutation();
   const [title, setTitle] = useState(task.title);
   const [description, setDescription] = useState(task.description);
   const [status, setStatus] = useState(task.status);
   const [priority, setPriority] = useState<Priority>(task.priority);
   const [dueDate, setDueDate] = useState(task.dueDate || "");
+  const [selectedTags, setSelectedTags] = useState<BaseTag[]>(task.tags || []);
   const [open, setOpen] = useState(false);
 
-  const handleSubmit = (e: FormEvent) => {
+  // Sync tags when task changes
+  useEffect(() => {
+    setSelectedTags(task.tags || []);
+  }, [task.tags]);
+
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    toast.promise(
-      updateMutation
-        .mutateAsync({
-          id: task.id,
-          title,
-          description,
-          status,
-          priority,
-          dueDate: dueDate || null,
-        })
-        .then(() => setOpen(false)),
-      {
-        loading: "Updating task...",
-        success: "Task updated successfully",
-        error: "Failed to update task",
+    
+    try {
+      await updateMutation.mutateAsync({
+        id: task.id,
+        title,
+        description,
+        status,
+        priority,
+        dueDate: dueDate || null,
+      });
+
+      // Update tags if changed
+      const currentTagIds = (task.tags || []).map(t => t.id).sort().join(',');
+      const newTagIds = selectedTags.map(t => t.id).sort().join(',');
+      if (currentTagIds !== newTagIds) {
+        await updateTagsMutation.mutateAsync({
+          taskId: task.id,
+          tagIds: selectedTags.map(t => t.id),
+        });
       }
-    );
+
+      setOpen(false);
+      toast.success("Task updated successfully");
+    } catch {
+      toast.error("Failed to update task");
+    }
   };
 
   return (
@@ -212,6 +230,14 @@ function TaskCellViewer({ task }: { task: Task }) {
               />
             </div>
             <div className="flex flex-col gap-3">
+              <Label>Tags</Label>
+              <TagCombobox
+                selectedTags={selectedTags}
+                onTagsChange={setSelectedTags}
+                placeholder="Select or create tags..."
+              />
+            </div>
+            <div className="flex flex-col gap-3">
               <Label>Created At</Label>
               <div className="text-muted-foreground">
                 {formatDate(task.createdAt)}
@@ -220,8 +246,8 @@ function TaskCellViewer({ task }: { task: Task }) {
           </form>
         </div>
         <DrawerFooter>
-          <Button onClick={handleSubmit} disabled={updateMutation.isPending}>
-            {updateMutation.isPending ? "Saving..." : "Save Changes"}
+          <Button onClick={handleSubmit} disabled={updateMutation.isPending || updateTagsMutation.isPending}>
+            {updateMutation.isPending || updateTagsMutation.isPending ? "Saving..." : "Save Changes"}
           </Button>
           <DrawerClose asChild>
             <Button variant="outline">Cancel</Button>
@@ -236,12 +262,19 @@ function ActionsCell({ task }: { task: Task }) {
   const isMobile = useIsMobile();
   const deleteMutation = useDeleteTaskMutation();
   const updateMutation = useUpdateTaskMutation();
+  const updateTagsMutation = useUpdateTaskTagsMutation();
   const [title, setTitle] = useState(task.title);
   const [description, setDescription] = useState(task.description);
   const [status, setStatus] = useState(task.status);
   const [priority, setPriority] = useState<Priority>(task.priority);
   const [dueDate, setDueDate] = useState(task.dueDate || "");
+  const [selectedTags, setSelectedTags] = useState<BaseTag[]>(task.tags || []);
   const [open, setOpen] = useState(false);
+
+  // Sync tags when task changes
+  useEffect(() => {
+    setSelectedTags(task.tags || []);
+  }, [task.tags]);
 
   const handleDelete = () => {
     toast.promise(deleteMutation.mutateAsync(task.id), {
@@ -251,25 +284,34 @@ function ActionsCell({ task }: { task: Task }) {
     });
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    toast.promise(
-      updateMutation
-        .mutateAsync({
-          id: task.id,
-          title,
-          description,
-          status,
-          priority,
-          dueDate: dueDate || null,
-        })
-        .then(() => setOpen(false)),
-      {
-        loading: "Updating task...",
-        success: "Task updated successfully",
-        error: "Failed to update task",
+    
+    try {
+      await updateMutation.mutateAsync({
+        id: task.id,
+        title,
+        description,
+        status,
+        priority,
+        dueDate: dueDate || null,
+      });
+
+      // Update tags if changed
+      const currentTagIds = (task.tags || []).map(t => t.id).sort().join(',');
+      const newTagIds = selectedTags.map(t => t.id).sort().join(',');
+      if (currentTagIds !== newTagIds) {
+        await updateTagsMutation.mutateAsync({
+          taskId: task.id,
+          tagIds: selectedTags.map(t => t.id),
+        });
       }
-    );
+
+      setOpen(false);
+      toast.success("Task updated successfully");
+    } catch {
+      toast.error("Failed to update task");
+    }
   };
 
   return (
@@ -374,6 +416,14 @@ function ActionsCell({ task }: { task: Task }) {
               />
             </div>
             <div className="flex flex-col gap-3">
+              <Label>Tags</Label>
+              <TagCombobox
+                selectedTags={selectedTags}
+                onTagsChange={setSelectedTags}
+                placeholder="Select or create tags..."
+              />
+            </div>
+            <div className="flex flex-col gap-3">
               <Label>Created At</Label>
               <div className="text-muted-foreground">
                 {formatDate(task.createdAt)}
@@ -382,8 +432,8 @@ function ActionsCell({ task }: { task: Task }) {
           </form>
         </div>
         <DrawerFooter>
-          <Button onClick={handleSubmit} disabled={updateMutation.isPending}>
-            {updateMutation.isPending ? "Saving..." : "Save Changes"}
+          <Button onClick={handleSubmit} disabled={updateMutation.isPending || updateTagsMutation.isPending}>
+            {updateMutation.isPending || updateTagsMutation.isPending ? "Saving..." : "Save Changes"}
           </Button>
           <DrawerClose asChild>
             <Button variant="outline">Cancel</Button>

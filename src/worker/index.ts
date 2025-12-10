@@ -195,8 +195,9 @@ app.post("/api/tasks", zValidator("json", createTaskSchema), async (c) => {
 
   const db = drizzle(c.env.DB);
   const now = new Date();
+  const taskId = crypto.randomUUID();
   const newTask = {
-    id: crypto.randomUUID(),
+    id: taskId,
     title: body.title,
     description: body.description ?? null,
     status: body.status,
@@ -208,6 +209,23 @@ app.post("/api/tasks", zValidator("json", createTaskSchema), async (c) => {
   };
 
   await db.insert(task).values(newTask);
+
+  // Handle tags if provided
+  if (body.tagIds && body.tagIds.length > 0) {
+    // Verify all tags belong to user
+    const userTags = await db
+      .select()
+      .from(tag)
+      .where(and(eq(tag.userId, user.id), inArray(tag.id, body.tagIds)));
+
+    if (userTags.length > 0) {
+      const taskTagValues = userTags.map((t) => ({
+        taskId,
+        tagId: t.id,
+      }));
+      await db.insert(taskTag).values(taskTagValues);
+    }
+  }
 
   return c.json({ task: newTask }, 201);
 });

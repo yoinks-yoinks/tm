@@ -6,6 +6,11 @@ import {
   IconCircleCheckFilled,
   IconDotsVertical,
   IconLoader,
+  IconArrowUp,
+  IconArrowDown,
+  IconArrowsSort,
+  IconEdit,
+  IconTrash,
 } from "@tabler/icons-react";
 import {
   ColumnDef,
@@ -20,7 +25,9 @@ import {
   SortingState,
   useReactTable,
   VisibilityState,
+  Column,
 } from "@tanstack/react-table";
+import { motion, AnimatePresence, type Easing } from "framer-motion";
 import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
@@ -103,6 +110,59 @@ function formatDate(dateString: string) {
     day: "numeric",
     year: "numeric",
   });
+}
+
+// Row animation variants
+const rowVariants = {
+  hidden: { opacity: 0, y: -10 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      delay: i * 0.03,
+      duration: 0.2,
+      ease: "easeOut" as Easing,
+    },
+  }),
+  exit: { opacity: 0, x: -10, transition: { duration: 0.15 } },
+};
+
+// Sortable column header component
+interface SortableHeaderProps<TData> {
+  column: Column<TData, unknown>;
+  title: string;
+}
+
+function SortableHeader<TData>({ column, title }: SortableHeaderProps<TData>) {
+  const isSorted = column.getIsSorted();
+  
+  return (
+    <Button
+      variant="ghost"
+      size="sm"
+      className="-ml-3 h-8 hover:bg-muted/50 font-medium group"
+      onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+    >
+      {title}
+      <motion.span
+        className="ml-2"
+        initial={false}
+        animate={{
+          rotate: isSorted === "desc" ? 180 : 0,
+          opacity: isSorted ? 1 : 0.5,
+        }}
+        transition={{ duration: 0.2 }}
+      >
+        {isSorted === "asc" ? (
+          <IconArrowUp className="h-4 w-4" />
+        ) : isSorted === "desc" ? (
+          <IconArrowDown className="h-4 w-4" />
+        ) : (
+          <IconArrowsSort className="h-4 w-4 opacity-0 group-hover:opacity-50 transition-opacity" />
+        )}
+      </motion.span>
+    </Button>
+  );
 }
 
 function TaskCellViewer({ task }: { task: Task }) {
@@ -326,16 +386,17 @@ function ActionsCell({ task }: { task: Task }) {
         <DropdownMenuTrigger asChild>
           <Button
             variant="ghost"
-            className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
+            className="data-[state=open]:bg-muted text-muted-foreground flex size-8 hover:bg-muted/80 transition-colors"
             size="icon"
           >
-            <IconDotsVertical />
+            <IconDotsVertical className="size-4" />
             <span className="sr-only">Open menu</span>
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-32">
+        <DropdownMenuContent align="end" className="w-36">
           <DrawerTrigger asChild>
-            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+            <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="gap-2">
+              <IconEdit className="size-4" />
               Edit
             </DropdownMenuItem>
           </DrawerTrigger>
@@ -344,7 +405,9 @@ function ActionsCell({ task }: { task: Task }) {
             variant="destructive"
             onClick={handleDelete}
             disabled={deleteMutation.isPending}
+            className="gap-2"
           >
+            <IconTrash className="size-4" />
             {deleteMutation.isPending ? "Deleting..." : "Delete"}
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -484,7 +547,7 @@ function StatusCell({ task }: { task: Task }) {
 const columns: ColumnDef<Task>[] = [
   {
     accessorKey: "title",
-    header: "Title",
+    header: ({ column }) => <SortableHeader column={column} title="Title" />,
     cell: ({ row }) => <TaskCellViewer task={row.original} />,
     enableHiding: false,
   },
@@ -499,20 +562,24 @@ const columns: ColumnDef<Task>[] = [
   },
   {
     accessorKey: "status",
-    header: "Status",
+    header: ({ column }) => <SortableHeader column={column} title="Status" />,
     cell: ({ row }) => <StatusCell task={row.original} />,
   },
   {
     accessorKey: "priority",
-    header: "Priority",
+    header: ({ column }) => <SortableHeader column={column} title="Priority" />,
     cell: ({ row }) => <PriorityBadge priority={row.original.priority} />,
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id));
     },
+    sortingFn: (rowA, rowB) => {
+      const priorityOrder = { urgent: 0, high: 1, medium: 2, low: 3 };
+      return priorityOrder[rowA.original.priority] - priorityOrder[rowB.original.priority];
+    },
   },
   {
     accessorKey: "dueDate",
-    header: "Due Date",
+    header: ({ column }) => <SortableHeader column={column} title="Due Date" />,
     cell: ({ row }) => <DueDateBadge dueDate={row.original.dueDate} />,
     sortingFn: (rowA, rowB) => {
       const a = rowA.original.dueDate;
@@ -550,20 +617,25 @@ const columns: ColumnDef<Task>[] = [
   },
   {
     accessorKey: "createdAt",
-    header: "Created",
+    header: ({ column }) => <SortableHeader column={column} title="Created" />,
     cell: ({ row }) => (
-      <div className="text-muted-foreground">
+      <div className="text-muted-foreground text-sm">
         {formatDate(row.original.createdAt)}
       </div>
     ),
   },
   {
     id: "actions",
+    header: "",
     cell: ({ row }) => <ActionsCell task={row.original} />,
   },
 ];
 
-export function DataTable() {
+interface DataTableProps {
+  searchQuery?: string;
+}
+
+export function DataTable({ searchQuery = "" }: DataTableProps) {
   const { data, isPending, isError } = useTasksQuery();
   const { selectedTagIds } = useTagFilter();
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -574,17 +646,32 @@ export function DataTable() {
     pageSize: 10,
   });
 
-  // Filter tasks by selected tags
+  // Filter tasks by selected tags and search query
   const tasks = useMemo(() => {
-    const allTasks = data?.tasks || [];
-    if (selectedTagIds.length === 0) return allTasks;
+    let filteredTasks = data?.tasks || [];
     
-    return allTasks.filter((task) => {
-      if (!task.tags || task.tags.length === 0) return false;
-      // Task must have at least one of the selected tags
-      return task.tags.some((tag) => selectedTagIds.includes(tag.id));
-    });
-  }, [data?.tasks, selectedTagIds]);
+    // Filter by tags
+    if (selectedTagIds.length > 0) {
+      filteredTasks = filteredTasks.filter((task) => {
+        if (!task.tags || task.tags.length === 0) return false;
+        return task.tags.some((tag) => selectedTagIds.includes(tag.id));
+      });
+    }
+    
+    // Filter by search query
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filteredTasks = filteredTasks.filter((task) => {
+        return (
+          task.title.toLowerCase().includes(query) ||
+          (task.description && task.description.toLowerCase().includes(query)) ||
+          (task.tags && task.tags.some((tag) => tag.name.toLowerCase().includes(query)))
+        );
+      });
+    }
+    
+    return filteredTasks;
+  }, [data?.tasks, selectedTagIds, searchQuery]);
 
   const table = useReactTable({
     data: tasks,
@@ -703,23 +790,31 @@ export function DataTable() {
               ))}
             </TableHeader>
             <TableBody>
-              {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))
-              ) : (
+              <AnimatePresence mode="popLayout">
+                {table.getRowModel().rows?.length ? (
+                  table.getRowModel().rows.map((row, index) => (
+                    <motion.tr
+                      key={row.id}
+                      custom={index}
+                      variants={rowVariants}
+                      initial="hidden"
+                      animate="visible"
+                      exit="exit"
+                      layout
+                      className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted group"
+                      data-state={row.getIsSelected() && "selected"}
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id} className="group-hover:bg-transparent">
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </TableCell>
+                      ))}
+                    </motion.tr>
+                  ))
+                ) : (
                 <TableRow>
                   <TableCell
                     colSpan={columns.length}
@@ -748,6 +843,7 @@ export function DataTable() {
                   </TableCell>
                 </TableRow>
               )}
+              </AnimatePresence>
             </TableBody>
           </Table>
         </div>

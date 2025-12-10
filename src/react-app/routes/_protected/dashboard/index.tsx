@@ -4,6 +4,8 @@ import { DataTable } from "@/components/data-table";
 import { KanbanBoard } from "@/components/kanban-board";
 import { SectionCards } from "@/components/section-cards";
 import { SiteHeader } from "@/components/site-header";
+import { ExportButton } from "@/components/export-button";
+import { SearchInput } from "@/components/search-input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
@@ -54,20 +56,37 @@ function RouteComponent() {
     return "table";
   });
 
+  const [searchQuery, setSearchQuery] = useState("");
+
   const { data: tasksData, isPending, isError } = useTasksQuery();
   const { selectedTagIds, clearTagFilters } = useTagFilter();
 
-  // Filter tasks by selected tags
+  // Filter tasks by selected tags and search query
   const filteredTasks = useMemo(() => {
-    const allTasks = tasksData?.tasks || [];
-    if (selectedTagIds.length === 0) return allTasks;
+    let tasks = tasksData?.tasks || [];
     
-    return allTasks.filter((task) => {
-      if (!task.tags || task.tags.length === 0) return false;
-      // Task must have at least one of the selected tags
-      return task.tags.some((tag) => selectedTagIds.includes(tag.id));
-    });
-  }, [tasksData?.tasks, selectedTagIds]);
+    // Filter by tags
+    if (selectedTagIds.length > 0) {
+      tasks = tasks.filter((task) => {
+        if (!task.tags || task.tags.length === 0) return false;
+        return task.tags.some((tag) => selectedTagIds.includes(tag.id));
+      });
+    }
+    
+    // Filter by search query
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      tasks = tasks.filter((task) => {
+        return (
+          task.title.toLowerCase().includes(query) ||
+          (task.description && task.description.toLowerCase().includes(query)) ||
+          (task.tags && task.tags.some((tag) => tag.name.toLowerCase().includes(query)))
+        );
+      });
+    }
+    
+    return tasks;
+  }, [tasksData?.tasks, selectedTagIds, searchQuery]);
 
   useEffect(() => {
     localStorage.setItem("dashboard-view", viewMode);
@@ -146,38 +165,68 @@ function RouteComponent() {
                       </motion.div>
                     )}
                   </AnimatePresence>
+                  {/* Search indicator */}
+                  <AnimatePresence>
+                    {searchQuery && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.8 }}
+                      >
+                        <Badge variant="outline" className="gap-1">
+                          Searching: "{searchQuery}"
+                        </Badge>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
-                <div className="flex items-center gap-1 bg-muted/50 p-1 rounded-lg">
-                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                    <Button
-                      variant={viewMode === "table" ? "secondary" : "ghost"}
-                      size="sm"
-                      onClick={() => setViewMode("table")}
-                      className={`transition-all duration-200 ${
-                        viewMode === "table" 
-                          ? "shadow-sm bg-background" 
-                          : "hover:bg-muted"
-                      }`}
-                    >
-                      <IconTable className="h-4 w-4 mr-1" />
-                      Table
-                    </Button>
-                  </motion.div>
-                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                    <Button
-                      variant={viewMode === "kanban" ? "secondary" : "ghost"}
-                      size="sm"
-                      onClick={() => setViewMode("kanban")}
-                      className={`transition-all duration-200 ${
-                        viewMode === "kanban" 
-                          ? "shadow-sm bg-background" 
-                          : "hover:bg-muted"
-                      }`}
-                    >
-                      <IconLayoutKanban className="h-4 w-4 mr-1" />
-                      Kanban
-                    </Button>
-                  </motion.div>
+                <div className="flex items-center gap-2">
+                  {/* Search Input */}
+                  <SearchInput
+                    value={searchQuery}
+                    onChange={setSearchQuery}
+                    placeholder="Search tasks..."
+                  />
+                  
+                  {/* Export Button */}
+                  <ExportButton
+                    allTasks={tasksData?.tasks || []}
+                    filteredTasks={filteredTasks}
+                  />
+                  
+                  {/* View Mode Toggle */}
+                  <div className="flex items-center gap-1 bg-muted/50 p-1 rounded-lg">
+                    <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                      <Button
+                        variant={viewMode === "table" ? "secondary" : "ghost"}
+                        size="sm"
+                        onClick={() => setViewMode("table")}
+                        className={`transition-all duration-200 ${
+                          viewMode === "table" 
+                            ? "shadow-sm bg-background" 
+                            : "hover:bg-muted"
+                        }`}
+                      >
+                        <IconTable className="h-4 w-4 mr-1" />
+                        Table
+                      </Button>
+                    </motion.div>
+                    <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                      <Button
+                        variant={viewMode === "kanban" ? "secondary" : "ghost"}
+                        size="sm"
+                        onClick={() => setViewMode("kanban")}
+                        className={`transition-all duration-200 ${
+                          viewMode === "kanban" 
+                            ? "shadow-sm bg-background" 
+                            : "hover:bg-muted"
+                        }`}
+                      >
+                        <IconLayoutKanban className="h-4 w-4 mr-1" />
+                        Kanban
+                      </Button>
+                    </motion.div>
+                  </div>
                 </div>
               </motion.div>
 
@@ -191,7 +240,7 @@ function RouteComponent() {
                     animate="animate"
                     exit="exit"
                   >
-                    <DataTable />
+                    <DataTable searchQuery={searchQuery} />
                   </motion.div>
                 ) : (
                   <motion.div

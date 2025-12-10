@@ -51,7 +51,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Skeleton } from "@/components/ui/skeleton";
+import { EmptyState } from "@/components/empty-state";
+import { TableSkeleton } from "@/components/loading-skeletons";
 import {
   Table,
   TableBody,
@@ -609,27 +610,8 @@ export function DataTable() {
 
   if (isPending) {
     return (
-      <div className="flex flex-col gap-4 px-4 lg:px-6">
-        <div className="flex items-center justify-between">
-          <Skeleton className="h-9 w-32" />
-          <div className="flex items-center gap-2">
-            <Skeleton className="h-9 w-36" />
-            <Skeleton className="h-9 w-28" />
-          </div>
-        </div>
-        <div className="overflow-hidden rounded-lg border">
-          <div className="p-4">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="flex items-center gap-4 py-3">
-                <Skeleton className="h-4 w-48" />
-                <Skeleton className="h-4 w-64" />
-                <Skeleton className="h-6 w-24" />
-                <Skeleton className="h-4 w-20" />
-                <Skeleton className="h-8 w-8" />
-              </div>
-            ))}
-          </div>
-        </div>
+      <div className="px-4 lg:px-6">
+        <TableSkeleton rows={5} columns={5} />
       </div>
     );
   }
@@ -637,8 +619,14 @@ export function DataTable() {
   if (isError) {
     return (
       <div className="px-4 lg:px-6">
-        <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-destructive">
-          Error loading tasks. Please try again.
+        <div className="overflow-hidden rounded-lg border">
+          <EmptyState
+            variant="error"
+            title="Couldn't load tasks"
+            description="We encountered an error loading your tasks. Please try refreshing the page."
+            actionLabel="Refresh"
+            onAction={() => window.location.reload()}
+          />
         </div>
       </div>
     );
@@ -735,9 +723,28 @@ export function DataTable() {
                 <TableRow>
                   <TableCell
                     colSpan={columns.length}
-                    className="h-24 text-center"
+                    className="h-72"
                   >
-                    No tasks found.
+                    {/* Check if we have tasks but they're filtered out vs no tasks at all */}
+                    {tasks.length === 0 && (data?.tasks?.length ?? 0) > 0 ? (
+                      <EmptyState
+                        variant="filtered-empty"
+                        title="No tasks match this filter"
+                        description="Try selecting different tags in the sidebar or clear your filters."
+                      />
+                    ) : tasks.length === 0 ? (
+                      <EmptyState
+                        variant="no-tasks"
+                        title="No tasks yet"
+                        description="Get started by clicking 'New Task' in the sidebar to create your first task."
+                      />
+                    ) : (
+                      <EmptyState
+                        variant="no-results"
+                        title="No results found"
+                        description="No tasks match your current view filter."
+                      />
+                    )}
                   </TableCell>
                 </TableRow>
               )}

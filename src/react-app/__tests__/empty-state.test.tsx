@@ -3,16 +3,21 @@
 import { describe, test, expect } from "bun:test";
 import { render } from "@testing-library/react";
 import { EmptyState } from "../components/empty-state";
-import { ClipboardList } from "lucide-react";
 
 describe("EmptyState Component", () => {
-  test("renders title", () => {
-    const { getByText } = render(<EmptyState title="No tasks yet" />);
+  test("renders default title for no-tasks variant", () => {
+    const { getByText } = render(<EmptyState variant="no-tasks" />);
     
     expect(getByText("No tasks yet")).toBeInTheDocument();
   });
 
-  test("renders description when provided", () => {
+  test("renders custom title when provided", () => {
+    const { getByText } = render(<EmptyState title="Custom Title" />);
+    
+    expect(getByText("Custom Title")).toBeInTheDocument();
+  });
+
+  test("renders custom description when provided", () => {
     const { getByText } = render(
       <EmptyState
         title="No tasks"
@@ -23,35 +28,42 @@ describe("EmptyState Component", () => {
     expect(getByText("Create your first task to get started")).toBeInTheDocument();
   });
 
-  test("renders icon when provided", () => {
-    const { container } = render(
-      <EmptyState
-        icon={ClipboardList}
-        title="No tasks"
-      />
-    );
-    
-    // Icon should be rendered inside a rounded div
-    const iconWrapper = container.querySelector(".rounded-full");
-    expect(iconWrapper).toBeTruthy();
+  test("renders different variants with correct defaults", () => {
+    const { getByText: getByTextNoResults } = render(<EmptyState variant="no-results" />);
+    expect(getByTextNoResults("No results found")).toBeInTheDocument();
+
+    const { getByText: getByTextFiltered } = render(<EmptyState variant="filtered-empty" />);
+    expect(getByTextFiltered("No matching tasks")).toBeInTheDocument();
+
+    const { getByText: getByTextError } = render(<EmptyState variant="error" />);
+    expect(getByTextError("Something went wrong")).toBeInTheDocument();
   });
 
-  test("renders action button when provided", () => {
+  test("renders action button when onAction is provided", () => {
     const handleClick = () => {};
     const { getByRole } = render(
       <EmptyState
-        title="No tasks"
-        action={{
-          label: "Create Task",
-          onClick: handleClick,
-        }}
+        variant="no-tasks"
+        onAction={handleClick}
       />
     );
     
-    expect(getByRole("button", { name: "Create Task" })).toBeInTheDocument();
+    expect(getByRole("button", { name: /Create Task/i })).toBeInTheDocument();
   });
 
-  test("does not render action button when not provided", () => {
+  test("renders custom action label", () => {
+    const handleClick = () => {};
+    const { getByRole } = render(
+      <EmptyState
+        actionLabel="Custom Action"
+        onAction={handleClick}
+      />
+    );
+    
+    expect(getByRole("button", { name: /Custom Action/i })).toBeInTheDocument();
+  });
+
+  test("does not render action button when onAction is not provided", () => {
     const { queryByRole } = render(<EmptyState title="No tasks" />);
     
     expect(queryByRole("button")).toBeNull();

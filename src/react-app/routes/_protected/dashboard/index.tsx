@@ -7,6 +7,8 @@ import { SiteHeader } from "@/components/site-header";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { EmptyState } from "@/components/empty-state";
+import { KanbanSkeleton } from "@/components/loading-skeletons";
 import { useDocumentTitle } from "@/hooks/use-document-title";
 import { useTasksQuery } from "@/hooks/use-tasks-query";
 import { useTagFilter } from "@/hooks/use-tag-filter";
@@ -52,7 +54,7 @@ function RouteComponent() {
     return "table";
   });
 
-  const { data: tasksData } = useTasksQuery();
+  const { data: tasksData, isPending, isError } = useTasksQuery();
   const { selectedTagIds, clearTagFilters } = useTagFilter();
 
   // Filter tasks by selected tags
@@ -200,7 +202,39 @@ function RouteComponent() {
                     exit="exit"
                     className="px-4 lg:px-6"
                   >
-                    <KanbanBoard tasks={filteredTasks} />
+                    {isPending ? (
+                      <KanbanSkeleton columns={3} cardsPerColumn={3} />
+                    ) : isError ? (
+                      <div className="overflow-hidden rounded-lg border">
+                        <EmptyState
+                          variant="error"
+                          title="Couldn't load tasks"
+                          description="We encountered an error loading your tasks. Please try refreshing the page."
+                          actionLabel="Refresh"
+                          onAction={() => window.location.reload()}
+                        />
+                      </div>
+                    ) : filteredTasks.length === 0 && (tasksData?.tasks?.length ?? 0) > 0 ? (
+                      <div className="overflow-hidden rounded-lg border">
+                        <EmptyState
+                          variant="filtered-empty"
+                          title="No tasks match this filter"
+                          description="Try selecting different tags in the sidebar or clear your filters."
+                          actionLabel="Clear Filters"
+                          onAction={clearTagFilters}
+                        />
+                      </div>
+                    ) : filteredTasks.length === 0 ? (
+                      <div className="overflow-hidden rounded-lg border">
+                        <EmptyState
+                          variant="no-tasks"
+                          title="No tasks yet"
+                          description="Get started by clicking 'New Task' in the sidebar to create your first task."
+                        />
+                      </div>
+                    ) : (
+                      <KanbanBoard tasks={filteredTasks} />
+                    )}
                   </motion.div>
                 )}
               </AnimatePresence>

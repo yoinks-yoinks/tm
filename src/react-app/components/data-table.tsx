@@ -513,7 +513,9 @@ function StatusCell({ task }: { task: Task }) {
   const updateMutation = useUpdateTaskMutation();
   const statusDisplay = getStatusDisplay(task.status);
 
-  const handleStatusChange = (newStatus: Task["status"]) => {
+  const handleStatusChange = async (newStatus: Task["status"]) => {
+    const previousStatus = task.status;
+    
     toast.promise(
       updateMutation.mutateAsync({
         id: task.id,
@@ -521,7 +523,16 @@ function StatusCell({ task }: { task: Task }) {
       }),
       {
         loading: "Updating status...",
-        success: "Status updated",
+        success: () => {
+          // Fire confetti when task is completed (and wasn't already completed)
+          if (newStatus === "completed" && previousStatus !== "completed") {
+            // Dynamic import to avoid loading confetti until needed
+            import("@/lib/confetti").then(({ fireTaskCompletedConfetti }) => {
+              fireTaskCompletedConfetti();
+            });
+          }
+          return "Status updated";
+        },
         error: "Failed to update status",
       }
     );

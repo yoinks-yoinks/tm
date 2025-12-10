@@ -4,10 +4,12 @@ import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { CommandMenu } from "@/components/command-menu";
-import { IconCommand, IconSearch } from "@tabler/icons-react";
+import { KeyboardShortcuts } from "@/components/keyboard-shortcuts";
+import { IconCommand, IconSearch, IconKeyboard } from "@tabler/icons-react";
 
 export function SiteHeader() {
   const [commandOpen, setCommandOpen] = useState(false);
+  const [shortcutsOpen, setShortcutsOpen] = useState(false);
 
   return (
     <>
@@ -43,6 +45,17 @@ export function SiteHeader() {
               <IconSearch className="h-4 w-4" />
               <span className="sr-only">Search</span>
             </Button>
+            {/* Keyboard shortcuts button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="hidden sm:flex"
+              onClick={() => setShortcutsOpen(true)}
+              title="Keyboard shortcuts (Ctrl+/)"
+            >
+              <IconKeyboard className="h-4 w-4" />
+              <span className="sr-only">Keyboard shortcuts</span>
+            </Button>
             <ThemeToggle />
             <Button variant="ghost" asChild size="sm" className="hidden sm:flex">
               <a
@@ -58,6 +71,7 @@ export function SiteHeader() {
         </div>
       </header>
       <CommandMenu open={commandOpen} onOpenChange={setCommandOpen} />
+      <KeyboardShortcuts open={shortcutsOpen} onOpenChange={setShortcutsOpen} />
     </>
   );
 }

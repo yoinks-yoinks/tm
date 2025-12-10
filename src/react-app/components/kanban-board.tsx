@@ -82,6 +82,7 @@ export function KanbanBoard({ tasks }: KanbanBoardProps) {
 
     // If dropped in a different status column, update the task
     if (activeTask.status !== overColumn) {
+      const previousStatus = activeTask.status;
       toast.promise(
         updateMutation.mutateAsync({
           id: activeId,
@@ -89,7 +90,15 @@ export function KanbanBoard({ tasks }: KanbanBoardProps) {
         }),
         {
           loading: "Moving task...",
-          success: "Task moved successfully",
+          success: () => {
+            // Fire confetti when task is moved to completed
+            if (overColumn === "completed" && previousStatus !== "completed") {
+              import("@/lib/confetti").then(({ fireTaskCompletedConfetti }) => {
+                fireTaskCompletedConfetti();
+              });
+            }
+            return "Task moved successfully";
+          },
           error: "Failed to move task",
         }
       );
